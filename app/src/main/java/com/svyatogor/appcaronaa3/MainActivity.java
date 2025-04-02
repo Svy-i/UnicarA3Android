@@ -20,7 +20,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText etDestino1;
     private EditText etData;
     private EditText etnVagas;
-    private Button btVerificacao;
+    private Button btPublicarCarona;
+    private EditText etOrigem2;
+    private EditText etDestino2;
+    private Button btBuscarCarona;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -38,13 +41,17 @@ public class MainActivity extends AppCompatActivity {
         etOrigem1 = findViewById(R.id.et_origem1);
         etDestino1 = findViewById(R.id.et_destino1);
         etData = findViewById(R.id.et_data);
-        btVerificacao = findViewById(R.id.bt_verificacao);
+        etnVagas = findViewById(R.id.etn_vagas);
+        btPublicarCarona = findViewById(R.id.bt_publicar_carona);
+        etOrigem2 = findViewById(R.id.et_origem2);
+        etDestino2 = findViewById(R.id.et_destino2);
+        btBuscarCarona = findViewById(R.id.bt_buscar_carona);
 
-        btVerificacao.setOnClickListener(v -> {
+        btPublicarCarona.setOnClickListener(v -> {
             startActivity(new Intent(this, SegundaTela.class));
         });
 
-        btVerificacao.setOnClickListener(new View.OnClickListener() {
+        btPublicarCarona.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = etNome.getText().toString();
