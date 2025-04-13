@@ -5,80 +5,78 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@drawable/background"
     tools:context=".MainActivity">
 
+    <View
+        android:id="@+id/v_container_components"
+        style="@style/ContainerComponents"
+        android:layout_width="350dp"
+        android:layout_height="420dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.482"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/v_container_components"
+        style="@style/ContainerComponents"
+        android:layout_width="350dp"
+        android:layout_height="260dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.500"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_publicar_carona" />
+
     <EditText
-        android:id="@+id/et_nome"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="32dp"
+        android:id="@+id/et_origem1"
+        style="@style/Edit_Text"
+        android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="Seu Nome"
-        android:inputType="textEmailAddress"
+        android:hint="Origem"
+        android:inputType="textPassword"
         android:textColor="@color/white"
         android:textColorHint="#767171"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_oferecer_carona" />
 
-    <EditText
-        android:id="@+id/et_origem1"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Origem"
-        android:textColor="@color/white"
-        android:textColorHint="#767171"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_nome" />
-
-    <TextView
-        android:id="@+id/tv_titulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="UniCar"
-        android:textColor="#3CEB40"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/bt_publicar_carona"
         android:layout_width="220dp"
-        android:layout_height="51dp"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:backgroundTint="#3CEB40"
         android:text="Publicar Carona"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etn_vagas" />
 
     <TextView
         android:id="@+id/tv_oferecer_carona"
+        style="@style/tv_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="40dp"
         android:text="Oferecer Carona"
-        android:textColor="#3CEB40"
-        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_titulo" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/et_destino1"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="8dp"
+        style="@style/Edit_Text"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Destino"
-        android:textColor="@color/white"
-        android:textColorHint="#767171"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,41 +84,36 @@
 
     <EditText
         android:id="@+id/et_data"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="8dp"
+        style="@style/Edit_Text"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="dd/mm/aaaa"
         android:inputType="date"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_destino1" />
 
     <EditText
         android:id="@+id/etn_vagas"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="8dp"
+        style="@style/Edit_Text"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Número de Vagas"
-        android:textColorHint="#767171"
-        android:textColor="@color/white"
         android:inputType="number"
+        android:textColor="@color/white"
+        android:textColorHint="#767171"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_data" />
 
     <EditText
         android:id="@+id/et_origem2"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="8dp"
+        style="@style/Edit_Text"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Origem"
-        android:textColorHint="#767171"
-        android:textColor="@color/white"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -128,34 +121,33 @@
 
     <EditText
         android:id="@+id/et_destino2"
-        android:layout_width="220dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="8dp"
+        style="@style/Edit_Text"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Destino"
-        android:textColorHint="#767171"
-        android:textColor="@color/white"
         android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="#767171"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_origem2" />
 
     <TextView
         android:id="@+id/tv_buscar_carona"
+        style="@style/tv_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:text="Procurar Carona"
-        android:textColor="#3CEB40"
-        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_publicar_carona" />
+        app:layout_constraintTop_toTopOf="@+id/v_container_components" />
 
     <Button
         android:id="@+id/bt_buscar_carona"
         android:layout_width="220dp"
-        android:layout_height="51dp"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="#3CEB40"
         android:text="Buscar"

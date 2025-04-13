@@ -1,6 +1,5 @@
 package com.svyatogor.appcaronaa3;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +14,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText etNome;
     private EditText etOrigem1;
     private EditText etDestino1;
     private EditText etData;
@@ -25,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText etDestino2;
     private Button btBuscarCarona;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +33,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        etNome = findViewById(R.id.et_nome);
+        iniciarComponentes();
+    } // final do onCreate
+    private void iniciarComponentes(){
         etOrigem1 = findViewById(R.id.et_origem1);
         etDestino1 = findViewById(R.id.et_destino1);
         etData = findViewById(R.id.et_data);
@@ -46,12 +44,12 @@ public class MainActivity extends AppCompatActivity {
         etOrigem2 = findViewById(R.id.et_origem2);
         etDestino2 = findViewById(R.id.et_destino2);
         btBuscarCarona = findViewById(R.id.bt_buscar_carona);
-
+    }
+    private void btMotorista(){
         btPublicarCarona.setOnClickListener(v -> {
             startActivity(new Intent(this, SegundaTela.class));
         });
-
-        btPublicarCarona.setOnClickListener(new View.OnClickListener() {
+        /*btPublicarCarona.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = etNome.getText().toString();
@@ -63,8 +61,12 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Email e senha incorretos", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
-    } // final do onCreate
+        });*/
+    }
+
+    private void btPassageiro(){
+
+    }
 
 }
 /* double valorDistancia = Double.parseDouble(etDistancia.getText().toString());
