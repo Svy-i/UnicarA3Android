@@ -2,10 +2,8 @@ package com.svyatogor.appcaronaa3;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         iniciarComponentes();
+        btMotorista();
+        btPassageiro();
     } // final do onCreate
     private void iniciarComponentes(){
         etOrigem1 = findViewById(R.id.et_origem1);
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void btMotorista(){
         btPublicarCarona.setOnClickListener(v -> {
-            startActivity(new Intent(this, SegundaTela.class));
+            startActivity(new Intent(this, TelaMotorista.class));
         });
         /*btPublicarCarona.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void btPassageiro(){
-
+        btBuscarCarona.setOnClickListener(v -> {
+            startActivity(new Intent(this, TelaPassageiro.class));
+        });
     }
 
 }

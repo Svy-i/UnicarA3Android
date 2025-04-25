@@ -76,7 +76,7 @@
         app:layout_constraintTop_toBottomOf="@+id/et_email_cadastro" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button"
+        android:id="@+id/bt_cadastro"
         style="@style/Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
