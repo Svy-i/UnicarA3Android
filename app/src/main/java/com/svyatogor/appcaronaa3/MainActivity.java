@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void btMotorista(){
         btPublicarCarona.setOnClickListener(v -> {
-            startActivity(new Intent(this, TelaMotorista.class));
+            startActivity(new Intent(this, PerfilUser.class));
         });
         /*btPublicarCarona.setOnClickListener(new View.OnClickListener() {
             @Override
