@@ -11,7 +11,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.svyatogor.appcaronaa3.Model.ConexaoBD;
+
 public class MainActivity extends AppCompatActivity {
+    ConexaoBD conexaoBD = new ConexaoBD();
     private EditText etOrigem1;
     private EditText etDestino1;
     private EditText etData;
@@ -47,21 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
     private void btMotorista(){
         btPublicarCarona.setOnClickListener(v -> {
+
             startActivity(new Intent(this, PerfilUser.class));
         });
-        /*btPublicarCarona.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = etNome.getText().toString();
-                String senha = etOrigem1.getText().toString();
-                if (email.equals("A") & senha.equals("B")){
-                    Toast.makeText(MainActivity.this, "Email e senha corretos", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this, SegundaTela.class));
-                } else {
-                    Toast.makeText(MainActivity.this, "Email e senha incorretos", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });*/
     }
 
     private void btPassageiro(){

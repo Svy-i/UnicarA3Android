@@ -13,8 +13,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class TelaCadastro extends AppCompatActivity {
+import com.svyatogor.appcaronaa3.Model.ConexaoBD;
 
+public class TelaCadastro extends AppCompatActivity {
+    ConexaoBD conexaoBD = new ConexaoBD();
     private Button btCadastro;
     private EditText etNomeCadastro;
     private EditText etEmailCadastro;
@@ -42,8 +44,20 @@ public class TelaCadastro extends AppCompatActivity {
     }
     private void btCadastrar() {
         btCadastro.setOnClickListener(v -> {
+            String nomeUsuario = etNomeCadastro.getText().toString();
+            String emailUsuario = etEmailCadastro.getText().toString();
+            String senhaUsuario = etSenhaCadastro.getText().toString();
+
+            String sql = "INSERT INTO usuario (nomeUsuario, emailUsuario, senhaUsuario) " +
+                    "VALUES ('" + nomeUsuario + "', '" + emailUsuario + "', '" + senhaUsuario + "');";
+
+            boolean salvo = ConexaoBD.salvar(sql);
+            if (salvo){
+                System.out.println("\nUsuário cadastrado com sucesso!\n");
+            } else {
+                System.out.println("\nErro ao cadastrar o usuário!\n");
+            }
             startActivity(new Intent(this, TelaLogin.class));
         });
     }
-
 }
