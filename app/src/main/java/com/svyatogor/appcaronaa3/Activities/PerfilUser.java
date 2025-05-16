@@ -1,4 +1,4 @@
-package com.svyatogor.appcaronaa3;
+package com.svyatogor.appcaronaa3.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,15 +21,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.svyatogor.appcaronaa3.R;
+
 import java.io.IOException;
 
 public class PerfilUser extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
-    private EditText etNomePerfil;
+    private TextView etNomePerfil;
     private TextView etEmailPerfil;
+    private EditText etTelefone;
     private View vEditFoto;
-    private View vEditNome;
-    private View vEditEmail;
+    private View vEditTelefone;
     private ImageView vContainerUser;
 
     @Override
@@ -44,16 +46,14 @@ public class PerfilUser extends AppCompatActivity {
         });
         iniciarComponentes();
         editarFoto();
-        editarNome();
-        editarEmail();
+        editarTelefone();
     } // fim do onCreate
 
     private void iniciarComponentes(){
         etNomePerfil = findViewById(R.id.et_nome_perfil);
         etEmailPerfil = findViewById(R.id.et_email_perfil);
         vEditFoto = findViewById(R.id.v_edit_foto);
-        vEditNome = findViewById(R.id.v_edit_nome);
-        vEditEmail = findViewById(R.id.v_edit_email);
+        vEditTelefone = findViewById(R.id.v_edit_telefone);
     }
 
     // Launcher para o Photo Picker
@@ -76,12 +76,12 @@ public class PerfilUser extends AppCompatActivity {
         });
     }
 
-    public void editarNome() {
+    public void editarTelefone() {
         // Variável para controlar o estado de edição
-        final boolean[] editandoNome = {false};
+        final boolean[] editandoTelefone = {false};
 
-        vEditNome.setOnClickListener(v -> {
-            if (editandoNome[0]) {
+        vEditTelefone.setOnClickListener(v -> {
+            if (editandoTelefone[0]) {
                 // Desabilita a edição
                 etNomePerfil.setFocusable(false);
                 etNomePerfil.setFocusableInTouchMode(false);
@@ -102,40 +102,9 @@ public class PerfilUser extends AppCompatActivity {
                 }
             }
             // Alterna o estado
-            editandoNome[0] = !editandoNome[0];
+            editandoTelefone[0] = !editandoTelefone[0];
         });
     }
-
-    public void editarEmail() {
-        // Variável para controlar o estado de edição
-        final boolean[] editandoEmail = {false};
-
-        vEditEmail.setOnClickListener(v -> {
-            if (editandoEmail[0]) {
-                // Desabilita a edição
-                etEmailPerfil.setFocusable(false);
-                etEmailPerfil.setFocusableInTouchMode(false);
-                etEmailPerfil.setClickable(false);
-                etEmailPerfil.setCursorVisible(false);
-                etEmailPerfil.setKeyListener(null);
-            } else {
-                // Habilita a edição
-                etEmailPerfil.setFocusable(true);
-                etEmailPerfil.setFocusableInTouchMode(true);
-                etEmailPerfil.setClickable(true);
-                etEmailPerfil.setCursorVisible(true);
-                etEmailPerfil.setKeyListener(new EditText(this).getKeyListener());
-                etEmailPerfil.requestFocus();
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.showSoftInput(etEmailPerfil, InputMethodManager.SHOW_IMPLICIT);
-                }
-            }
-            // Alterna o estado
-            editandoEmail[0] = !editandoEmail[0];
-        });
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

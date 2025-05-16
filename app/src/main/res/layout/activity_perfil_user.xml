@@ -6,7 +6,7 @@
     android:background="@drawable/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PerfilUser">
+    tools:context=".Activities.PerfilUser">
 
     <View
         android:id="@+id/v_container_user"
@@ -32,7 +32,7 @@
         android:id="@+id/imageView2"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,41 +43,43 @@
         android:id="@+id/imageView3"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.41000003"
         app:srcCompat="@drawable/ic_email" />
 
-    <EditText
+    <TextView
         android:id="@+id/et_nome_perfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
+        android:fontFamily="monospace"
         android:hint="Nome"
         android:inputType="text"
-        android:maxLength="40"
+        android:maxLength="35"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.31" />
 
-    <EditText
+    <TextView
         android:id="@+id/et_email_perfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
+        android:fontFamily="monospace"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:maxLength="40"
+        android:maxLength="35"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView3"
@@ -120,32 +122,21 @@
         app:srcCompat="@android:drawable/ic_menu_gallery" />
 
     <ImageView
-        android:id="@+id/v_edit_email"
+        android:id="@+id/v_edit_telefone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.41000003"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
-
-    <ImageView
-        android:id="@+id/v_edit_nome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.31"
+        app:layout_constraintVertical_bias="0.51"
         app:srcCompat="@android:drawable/ic_menu_edit" />
 
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -153,13 +144,14 @@
         app:srcCompat="@android:drawable/ic_menu_call" />
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/et_edit_telefone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:ems="10"
+        android:layout_marginStart="8dp"
+        android:fontFamily="monospace"
         android:hint="Telefone"
         android:inputType="text"
+        android:maxLength="35"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView4"

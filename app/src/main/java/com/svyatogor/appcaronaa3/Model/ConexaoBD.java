@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class ConexaoBD {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/unicar_db";
+    private static final String URL = "jdbc:mysql://localhost:3306/unicara3db";
     private static final String USER = "Svy";
     private static final String PASSWORD = "S3nhaSQL!";
 

@@ -1,11 +1,9 @@
-package com.svyatogor.appcaronaa3;
+package com.svyatogor.appcaronaa3.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.svyatogor.appcaronaa3.Model.ConexaoBD;
+import com.svyatogor.appcaronaa3.R;
 
 public class TelaCadastro extends AppCompatActivity {
     ConexaoBD conexaoBD = new ConexaoBD();
