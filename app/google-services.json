@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "443376980091",
+    "project_id": "unicardb",
+    "storage_bucket": "unicardb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443376980091:android:47d76118e694a2c6ae92de",
+        "android_client_info": {
+          "package_name": "com.svyatogor.appcaronaa3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEKVL-fI4LobdgCOoOZJPpu_U6FKhh0Ao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

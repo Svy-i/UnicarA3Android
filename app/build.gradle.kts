@@ -1,11 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
+
 
 android {
     namespace = "com.svyatogor.appcaronaa3"
     compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.svyatogor.appcaronaa3"
@@ -15,6 +18,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -34,6 +38,9 @@ android {
         jvmTarget = "11"
     }
 }
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-Xlint:deprecation")
+}
 
 dependencies {
 
@@ -49,6 +56,8 @@ dependencies {
     // 🔗 Retrofit + Gson
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+
 
     // 🌐 Logging (opcional)
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
@@ -57,4 +66,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+
+
 }

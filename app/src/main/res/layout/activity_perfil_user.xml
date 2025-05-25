@@ -8,25 +8,17 @@
     android:layout_height="match_parent"
     tools:context=".Activities.PerfilUser">
 
-    <View
-        android:id="@+id/v_container_user"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ic_user"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/container_user"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_gravity="center"/>
 
-    <ImageView
-        android:id="@+id/ic_user"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:layout_constraintBottom_toBottomOf="@+id/v_container_user"
-        app:layout_constraintEnd_toEndOf="@+id/v_container_user"
-        app:layout_constraintStart_toStartOf="@+id/v_container_user"
-        app:layout_constraintTop_toTopOf="@+id/v_container_user"
-        app:srcCompat="@drawable/ic_user" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -51,7 +43,7 @@
         app:srcCompat="@drawable/ic_email" />
 
     <TextView
-        android:id="@+id/et_nome_perfil"
+        android:id="@+id/tv_nome_perfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -69,7 +61,7 @@
         app:layout_constraintVertical_bias="0.31" />
 
     <TextView
-        android:id="@+id/et_email_perfil"
+        android:id="@+id/tv_email_perfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -111,18 +103,18 @@
         app:layout_constraintVertical_bias="0.618" />
 
     <ImageView
-        android:id="@+id/v_edit_foto"
+        android:id="@+id/iv_edit_foto"
         android:layout_width="41dp"
         android:layout_height="42dp"
         android:layout_marginTop="132dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/v_container_user"
+        app:layout_constraintStart_toEndOf="@+id/ic_user"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_gallery" />
 
     <ImageView
-        android:id="@+id/v_edit_telefone"
+        android:id="@+id/iv_edit_telefone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"

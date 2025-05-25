@@ -52,9 +52,11 @@
         android:layout_width="220dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="#3CEB40"
         android:text="Publicar Carona"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/v_container_components_motorista"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etn_vagas" />
@@ -64,12 +66,12 @@
         style="@style/tv_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
         android:text="Oferecer Carona"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/v_container_components_motorista" />
 
     <EditText
         android:id="@+id/et_destino1"
@@ -137,7 +139,7 @@
         style="@style/tv_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="Procurar Carona"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -149,9 +151,11 @@
         android:layout_width="220dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="#3CEB40"
         android:text="Buscar"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/v_container_components_passageiro"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_destino2" />
