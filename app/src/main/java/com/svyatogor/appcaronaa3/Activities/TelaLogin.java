@@ -25,6 +25,7 @@ public class TelaLogin extends AppCompatActivity {
 
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private TextView tvCadastro;
+    private TextView tvEsqueciSenha;
     private Button btEntrar;
     private EditText etEmail;
     private EditText etSenha;
@@ -48,9 +49,14 @@ public class TelaLogin extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        //Clicar no texto "Esqueci minha senha" leva para a activity de RecuperarSenha
+        tvEsqueciSenha.setOnClickListener(v -> {
+            startActivity(new Intent(this, RecuperarSenha.class));
+        });
     } // fim do onCreate
     private void inicializarComponentes(){
         tvCadastro = findViewById(R.id.tv_cadastro);
+        tvEsqueciSenha = findViewById(R.id.tv_esqueci_senha);
         btEntrar = findViewById(R.id.bt_entrar);
         etEmail = findViewById(R.id.et_email);
         etSenha = findViewById(R.id.et_senha);
