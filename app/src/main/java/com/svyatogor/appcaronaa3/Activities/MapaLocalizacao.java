@@ -1,4 +1,4 @@
-package com.svyatogor.appcaronaa3;
+package com.svyatogor.appcaronaa3.Activities;
 
 import android.os.Bundle;
 import android.view.View;
