@@ -81,7 +81,7 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    private void setupMap() {
+    public void setupMap() {
         if (map != null) {
             map.setTileSource(TileSourceFactory.MAPNIK);
             map.setMultiTouchControls(true);

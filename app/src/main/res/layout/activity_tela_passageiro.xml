@@ -1,10 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.TelaPassageiro">
 
+    <org.osmdroid.views.MapView
+        android:id="@+id/map_view_passageiro"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_map_buttons" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_map_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <EditText
+        android:id="@+id/et_origem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Sua localização atual"
+        android:padding="12dp"
+        android:layout_margin="16dp"
+        android:inputType="text"
+        android:textColor="@color/black"
+        android:background="@drawable/rounded_edittext_background"
+        app:layout_constraintTop_toBottomOf="@+id/guideline_map_buttons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:imeOptions="actionDone"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/et_destino"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Para onde você quer ir?"
+        android:padding="12dp"
+        android:layout_margin="16dp"
+        android:inputType="text"
+        android:textColor="@color/black"
+        android:background="@drawable/rounded_edittext_background"
+        app:layout_constraintTop_toBottomOf="@+id/et_origem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:imeOptions="actionDone"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/btn_solicitar_carona"
+        style="@style/Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Solicitar Carona"
+        android:layout_margin="16dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@+id/et_destino"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_motoristas_disponiveis"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Motoristas Disponíveis:"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_solicitar_carona"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+    <ListView
+        android:id="@+id/lv_motoristas"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_motoristas_disponiveis"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+    <ImageView
+        android:id="@+id/ic_user_passageiro"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_user" />
 </androidx.constraintlayout.widget.ConstraintLayout>

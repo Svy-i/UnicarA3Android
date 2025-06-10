@@ -6,10 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".Activities.MapActivity">
 
-    <org.osmdroid.views.MapView
+    <org.osmdroid.views.MapView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map_view_dedicated"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
     <ImageButton
         android:id="@+id/ib_close_map"
