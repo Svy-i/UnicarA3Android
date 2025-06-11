@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.svyatogor.appcaronaa3.Interfaces.OnAcceptRideClickListener;
 import com.svyatogor.appcaronaa3.R;
 
 import java.util.List;
@@ -15,14 +17,10 @@ import java.util.List;
 public class PassengerRequestAdapter extends RecyclerView.Adapter<PassengerRequestAdapter.PassengerRequestViewHolder> {
 
     private List<Usuario> passageirosLista;
-    private OnItemClickListener listener;
+    private OnAcceptRideClickListener listener; // Usando a interface externa
 
-    // Interface para lidar com cliques nos itens
-    public interface OnItemClickListener {
-        void onAcceptRideClick(Usuario passageiro);
-    }
-
-    public PassengerRequestAdapter(List<Usuario> passageirosLista, OnItemClickListener listener) {
+    // O construtor agora aceita a interface OnAcceptRideClickListener
+    public PassengerRequestAdapter(List<Usuario> passageirosLista, OnAcceptRideClickListener listener) {
         this.passageirosLista = passageirosLista;
         this.listener = listener;
     }
@@ -47,6 +45,7 @@ public class PassengerRequestAdapter extends RecyclerView.Adapter<PassengerReque
 
         holder.btnAcceptRide.setOnClickListener(v -> {
             if (listener != null) {
+                // Chama o método onAcceptRideClick da interface
                 listener.onAcceptRideClick(passenger);
             }
         });

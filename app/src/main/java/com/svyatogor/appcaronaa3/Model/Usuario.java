@@ -15,12 +15,17 @@ public class Usuario {
     private String destino;
     private boolean isLookingForRide;
 
+    // Campos para a funcionalidade do Motorista
+    private boolean isDriver; // true if the user is a driver, false if a passenger
+    private Carro carro; // Car details for drivers
+
     public Usuario() {
+        // Default constructor required for Firebase DataSnapshot.getValue(Usuario.class)
     }
 
-    //Construtor completo
+    // Construtor completo
     public Usuario(String uid, String nome, String email, String telefone, String fotoPerfilUrl,
-                   String pontoDeChegada, String destino, boolean isLookingForRide) {
+                   String pontoDeChegada, String destino, boolean isLookingForRide, boolean isDriver, Carro carro) {
         this.uid = uid;
         this.nome = nome;
         this.email = email;
@@ -29,67 +34,33 @@ public class Usuario {
         this.pontoDeChegada = pontoDeChegada;
         this.destino = destino;
         this.isLookingForRide = isLookingForRide;
+        this.isDriver = isDriver;
+        this.carro = carro;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    // Getters
+    public String getUid() { return uid; }
+    public String getNome() { return nome; }
+    public String getEmail() { return email; }
+    public String getTelefone() { return telefone; }
+    public String getFotoPerfilUrl() { return fotoPerfilUrl; }
+    public String getPontoDeChegada() { return pontoDeChegada; }
+    public String getDestino() { return destino; }
+    public boolean isLookingForRide() { return isLookingForRide; }
+    public boolean isDriver() { return isDriver; }
+    public Carro getCarro() { return carro; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
+    // Setters
     public void setUid(String uid) { this.uid = uid; }
-
-    public void setFotoPerfilUrl(String fotoPerfilUrl) {
-        this.fotoPerfilUrl = fotoPerfilUrl;
-    }
-
-    public void setPontoDeChegada(String pontoDeChegada) {
-        this.pontoDeChegada = pontoDeChegada;
-    }
-
-    public void setDestino(String destino) {
-        this.destino = destino;
-    }
-
-    public void setLookingForRide(boolean lookingForRide) {
-        isLookingForRide = lookingForRide;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-    public String getNome() {
-        return nome;
-    }
-    public String getFotoPerfilUrl() {
-        return fotoPerfilUrl;
-    }
-
-    public String getPontoDeChegada() {
-        return pontoDeChegada;
-    }
-
-    public String getDestino() {
-        return destino;
-    }
-
-    public boolean isLookingForRide() {
-        return isLookingForRide;
-    }
+    public void setNome(String nome) { this.nome = nome; }
+    public void setEmail(String email) { this.email = email; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public void setFotoPerfilUrl(String fotoPerfilUrl) { this.fotoPerfilUrl = fotoPerfilUrl; }
+    public void setPontoDeChegada(String pontoDeChegada) { this.pontoDeChegada = pontoDeChegada; }
+    public void setDestino(String destino) { this.destino = destino; }
+    public void setLookingForRide(boolean lookingForRide) { isLookingForRide = lookingForRide; }
+    public void setDriver(boolean driver) { isDriver = driver; }
+    public void setCarro(Carro carro) { this.carro = carro; }
 
     @Override
     public String toString() {

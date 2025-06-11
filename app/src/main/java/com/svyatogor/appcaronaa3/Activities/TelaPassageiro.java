@@ -558,11 +558,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // Não é comumente usado em apps modernos, mas pode ser implementado se necessário.
-    }
-
-    @Override
     public void onProviderEnabled(String provider) {
         Toast.makeText(this, "GPS habilitado!", Toast.LENGTH_SHORT).show();
     }
@@ -573,17 +568,17 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     }
 
     private void buscarMotoristasDisponiveis() {
-        databaseReference.child("usuarios").orderByChild("isLookingForRide").equalTo(false) // Motoristas que não estão procurando carona
+        // Altere a consulta inicial para buscar *todos* os usuários, e então filtre localmente
+        // Isso é feito para poder aplicar o filtro isDriver() que não pode ser usado com orderByChild("isLookingForRide").equalTo(false) diretamente se isDriver for outro nó.
+        databaseReference.child("usuarios")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         motoristasDisponiveis.clear();
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             Usuario usuario = snapshot.getValue(Usuario.class);
-                            // Supondo que "isLookingForRide = false" signifique que ele é um motorista disponível
-                            // E que você tenha um campo ou lógica para diferenciar motoristas de passageiros (ex: tipoUsuario)
-                            // Para este exemplo, apenas verificamos o nome e a flag
-                            if (usuario != null && usuario.getNome() != null && !usuario.isLookingForRide()) {
+                            // Filtra por motoristas que não estão procurando carona e são de fato motoristas
+                            if (usuario != null && usuario.getNome() != null && usuario.isDriver() && !usuario.isLookingForRide()) {
                                 // Adicione um filtro para garantir que não é o próprio usuário (passageiro)
                                 if (auth.getCurrentUser() != null && !usuario.getUid().equals(auth.getCurrentUser().getUid())) {
                                     motoristasDisponiveis.add(usuario);

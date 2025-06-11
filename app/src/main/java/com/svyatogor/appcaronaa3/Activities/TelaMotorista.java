@@ -1,5 +1,6 @@
 package com.svyatogor.appcaronaa3.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,27 +24,28 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.svyatogor.appcaronaa3.Interfaces.OnAcceptRideClickListener; // Importe a nova interface
 import com.svyatogor.appcaronaa3.Model.PassengerRequestAdapter;
 import com.svyatogor.appcaronaa3.Model.Usuario;
 import com.svyatogor.appcaronaa3.R;
-import org.osmdroid.views.MapView;
+import org.osmdroid.views.MapView; // Mantido, mas não usado diretamente nesta lógica.
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TelaMotorista extends AppCompatActivity {
+public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClickListener {
     private RecyclerView recyclerViewPassengerRequests;
     private PassengerRequestAdapter passengerRequestAdapter;
     private List<Usuario> passengerList;
     private TextView tvNoRequests;
 
     private FirebaseAuth auth;
-    private DatabaseReference usersRef; // Referência para o nó "usuarios"
-    private DatabaseReference ridesRef; // Referência para o nó "viagens" (ou "rides")
+    private DatabaseReference usersRef;
+    private DatabaseReference ridesRef;
 
-    private ValueEventListener passengerRequestListener; // Listener para solicitações de passageiros
+    private ValueEventListener passengerRequestListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,26 +63,24 @@ public class TelaMotorista extends AppCompatActivity {
             Toast.makeText(this, "Faça login como motorista.", Toast.LENGTH_LONG).show();
             finish(); // Fecha a Activity se não houver usuário logado
             // Você pode redirecionar para uma tela de login aqui
+            startActivity(new Intent(this, TelaLogin.class)); // Exemplo de redirecionamento
             return;
         }
-
-        // Você precisaria de um mecanismo para identificar o tipo de usuário (motorista/passageiro)
-        // Isso geralmente é armazenado no perfil do usuário no Realtime Database/Firestore ou em Custom Claims.
-        // Por simplicidade, vamos assumir que se ele está nesta Activity, ele é um motorista.
-        // usersRef.child(currentUser.getUid()).child("userType").addListenerForSingleValueEvent(...);
 
         recyclerViewPassengerRequests = findViewById(R.id.recyclerViewPassengerRequests);
         tvNoRequests = findViewById(R.id.tvNoRequests);
         recyclerViewPassengerRequests.setLayoutManager(new LinearLayoutManager(this));
 
         passengerList = new ArrayList<>();
+        // Inicializa o adaptador passando a lista e 'this' como o listener
+        passengerRequestAdapter = new PassengerRequestAdapter(passengerList, this::onAcceptRideClick);
         recyclerViewPassengerRequests.setAdapter(passengerRequestAdapter);
 
-        // Botão para ações do motorista (ex: ir para perfil)
+        // Ir para o perfil
         Button btnDriverProfile = findViewById(R.id.btnDriverProfile);
         btnDriverProfile.setOnClickListener(v -> {
-            Toast.makeText(TelaMotorista.this, "Navegar para o Perfil do Motorista", Toast.LENGTH_SHORT).show();
-            // Implemente a navegação para a tela de perfil do motorista aqui
+            Toast.makeText(TelaMotorista.this, "Navegar para o Perfil seu perfil", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(TelaMotorista.this, PerfilUser.class));
         });
 
         // Inicia a escuta por passageiros no Realtime Database
@@ -93,7 +95,8 @@ public class TelaMotorista extends AppCompatActivity {
                 passengerList.clear(); // Limpa a lista para adicionar os dados atualizados
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                     Usuario usuario = userSnapshot.getValue(Usuario.class);
-                    if (usuario != null && usuario.isLookingForRide()) {
+                    // Adicionando uma verificação para garantir que o usuário não é um motorista e está procurando carona
+                    if (usuario != null && !usuario.isDriver() && usuario.isLookingForRide()) {
                         // Certifique-se de que o UID do usuário é setado no objeto Usuario
                         usuario.setUid(userSnapshot.getKey());
                         passengerList.add(usuario);
@@ -119,13 +122,10 @@ public class TelaMotorista extends AppCompatActivity {
         };
 
         // Adiciona o listener ao nó "usuarios"
-        // Em um app mais complexo, você pode ter um nó "solicitacoes_pendentes"
-        // ou usar consultas mais avançadas se a lista de usuários for muito grande.
         usersRef.addValueEventListener(passengerRequestListener);
     }
 
-
-    /*@Override
+    @Override
     public void onAcceptRideClick(Usuario passageiro) {
         FirebaseUser driver = auth.getCurrentUser();
         if (driver == null) {
@@ -163,11 +163,12 @@ public class TelaMotorista extends AppCompatActivity {
                                     Toast.makeText(TelaMotorista.this, "Viagem iniciada! Detalhes em breve.", Toast.LENGTH_LONG).show();
 
                                     // Opcional: Remover o passageiro da lista de solicitações pendentes
-                                    // passengerList.remove(passenger); // Isso será feito pelo listener
-                                    // passengerRequestAdapter.notifyDataSetChanged();
+                                    // A lista será atualizada automaticamente pelo listener,
+                                    // então não precisamos remover manualmente aqui.
 
                                     // Em um aplicativo real, você navegaria para uma tela de acompanhamento da viagem
                                     // com mapa, informações do passageiro, etc.
+                                    // Exemplo: startActivity(new Intent(TelaMotorista.this, RideTrackingActivity.class));
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e("TelaMotorista", "Erro ao criar viagem: " + e.getMessage());
@@ -180,6 +181,7 @@ public class TelaMotorista extends AppCompatActivity {
                     Toast.makeText(TelaMotorista.this, "Erro ao aceitar carona.", Toast.LENGTH_SHORT).show();
                 });
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -187,5 +189,5 @@ public class TelaMotorista extends AppCompatActivity {
         if (passengerRequestListener != null) {
             usersRef.removeEventListener(passengerRequestListener);
         }
-    }*/
+    }
 }

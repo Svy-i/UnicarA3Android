@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         btnEntrarMotorista = findViewById(R.id.btn_entrar_motorista);
         btnEntrarPassageiro = findViewById(R.id.btn_entrar_passageiro);
         btnEntrarMotorista.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, TelaMotorista.class));
+            startActivity(new Intent(MainActivity.this, CadastroMotorista.class));
         });
         btnEntrarPassageiro.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, TelaPassageiro.class));
