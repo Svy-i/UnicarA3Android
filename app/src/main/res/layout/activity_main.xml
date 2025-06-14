@@ -11,12 +11,13 @@
 
     <Button
         android:id="@+id/btn_entrar_passageiro"
+        style="@style/Button"
         android:layout_width="220dp"
         android:layout_height="50dp"
         android:layout_marginTop="32dp"
         android:backgroundTint="#3CEB40"
         android:text="Passageiro"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,11 +25,12 @@
 
     <Button
         android:id="@+id/btn_entrar_motorista"
+        style="@style/Button"
         android:layout_width="220dp"
         android:layout_height="50dp"
         android:backgroundTint="#3CEB40"
         android:text="Motorista"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

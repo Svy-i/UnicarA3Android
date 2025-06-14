@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+import com.svyatogor.appcaronaa3.Model.Carro;
 import com.svyatogor.appcaronaa3.Model.Usuario;
 import com.svyatogor.appcaronaa3.R;
 
@@ -19,69 +21,62 @@ import java.util.List;
 
 public class MotoristaAdapter extends ArrayAdapter<Usuario> {
 
-    public interface OnAceitarClickListener {
+    private final Context context;
+    private final List<Usuario> motoristas;
+    private final OnMotoristaActionListener listener;
+    public interface OnMotoristaActionListener {
         void onAceitarClick(Usuario motorista);
     }
 
-    private OnAceitarClickListener listener;
-
-    public MotoristaAdapter(@NonNull Context context, @NonNull List<Usuario> motoristas, OnAceitarClickListener listener) {
+    public MotoristaAdapter(@NonNull Context context, List<Usuario> motoristas, OnMotoristaActionListener listener) {
         super(context, 0, motoristas);
+        this.context = context;
+        this.motoristas = motoristas;
         this.listener = listener;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View listItemView = convertView;
-        // Se a visualização não existe (primeira vez ou reciclagem), infle-a do XML
-        if (listItemView == null) {
-            // Garante que 'list_item_motorista' seja inflado corretamente
-            listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.list_item_motorista, parent, false);
-            Log.d("MotoristaAdapter", "Inflating new listItemView for position: " + position);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_motorista, parent, false);
+        }
+
+        Usuario motorista = motoristas.get(position);
+
+        ImageView ivUserPhoto = convertView.findViewById(R.id.iv_user_photo);
+        TextView tvNomeMotorista = convertView.findViewById(R.id.tv_nome_motorista);
+        TextView tvPlacaCarro = convertView.findViewById(R.id.tv_placa_carro);
+        TextView tvNumVagas = convertView.findViewById(R.id.tv_num_vagas);
+        Button btnAceitarMotorista = convertView.findViewById(R.id.btn_aceitar_motorista);
+
+        tvNomeMotorista.setText(motorista.getNome());
+
+        Carro carro = motorista.getCarro();
+        if (carro != null) {
+            tvPlacaCarro.setText("Placa: " + carro.getPlaca());
+            tvNumVagas.setText("Vagas: " + carro.getNumVagas());
         } else {
-            Log.d("MotoristaAdapter", "Reusing convertView for position: " + position);
+            tvPlacaCarro.setText("Placa: N/A");
+            tvNumVagas.setText("Vagas: N/A");
         }
 
-        Usuario currentMotorista = getItem(position);
-
-        // Encontra as views dentro do listItemView inflado
-        TextView tvNomeMotorista = listItemView.findViewById(R.id.tv_nome_motorista);
-        Button btnAceitar = listItemView.findViewById(R.id.btn_aceitar_motorista);
-
-        // Adiciona uma verificação para garantir que as views foram encontradas
-        if (tvNomeMotorista == null) {
-            Log.e("MotoristaAdapter", "tv_nome_motorista é null! Verifique seu list_item_motorista.xml e R.id.");
-        }
-        if (btnAceitar == null) {
-            Log.e("MotoristaAdapter", "btn_aceitar_motorista é null! Verifique seu list_item_motorista.xml e R.id.");
-        }
-
-
-        if (currentMotorista != null) {
-            // Verifica se tvNomeMotorista não é null antes de usar
-            if (tvNomeMotorista != null) {
-                tvNomeMotorista.setText(currentMotorista.getNome());
-            } else {
-                Log.e("MotoristaAdapter", "Erro: TextView tvNomeMotorista é null para motorista: " + currentMotorista.getNome());
-            }
-
-            // Verifica se btnAceitar não é null antes de usar
-            if (btnAceitar != null) {
-                btnAceitar.setOnClickListener(v -> {
-                    if (listener != null) {
-                        listener.onAceitarClick(currentMotorista);
-                    }
-                });
-            } else {
-                Log.e("MotoristaAdapter", "Erro: Button btnAceitar é null para motorista: " + currentMotorista.getNome());
-            }
-
+        if (motorista.getFotoPerfilUrl() != null && !motorista.getFotoPerfilUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(motorista.getFotoPerfilUrl())
+                    .placeholder(R.drawable.ic_user)
+                    .error(R.drawable.ic_eye_off)
+                    .into(ivUserPhoto);
         } else {
-            Log.w("MotoristaAdapter", "currentMotorista é null na posição: " + position);
+            ivUserPhoto.setImageResource(R.drawable.ic_user);
         }
 
-        return listItemView;
+        btnAceitarMotorista.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAceitarClick(motorista);
+            }
+        });
+
+        return convertView;
     }
 }

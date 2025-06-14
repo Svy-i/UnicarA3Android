@@ -18,9 +18,8 @@ import java.util.List;
 public class PassengerRequestAdapter extends RecyclerView.Adapter<PassengerRequestAdapter.PassengerRequestViewHolder> {
 
     private List<Usuario> passageirosLista;
-    private OnAcceptRideClickListener listener; // Usando a interface externa
+    private OnAcceptRideClickListener listener;
 
-    // O construtor agora aceita a interface OnAcceptRideClickListener
     public PassengerRequestAdapter(List<Usuario> passageirosLista, OnAcceptRideClickListener listener) {
         this.passageirosLista = passageirosLista;
         this.listener = listener;
@@ -40,9 +39,6 @@ public class PassengerRequestAdapter extends RecyclerView.Adapter<PassengerReque
         holder.tvPickupLocation.setText("Partida: " + passenger.getOrigem());
         holder.tvDestination.setText("Destino: " + passenger.getDestino());
 
-        // Opcional: Se você tiver a distância, defina e torne visível
-        // holder.tvEstimatedDistance.setText(String.format("Distância: %.1f km", passenger.getDistance()));
-        // holder.tvEstimatedDistance.setVisibility(View.VISIBLE);
 
         holder.btnAcceptRide.setOnClickListener(v -> {
             if (listener != null) {

@@ -4,31 +4,80 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="8dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:background="@android:color/white"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:elevation="2dp">
 
-    <TextView
-        android:id="@+id/tv_nome_motorista"
+    <!-- Foto do Usuário -->
+    <ImageView
+        android:id="@+id/iv_user_photo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="centerCrop"
+        android:src="@android:drawable/sym_def_app_icon"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="Foto do Usuário" />
+
+    <!-- Container para Nome do Motorista -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:text="Nome do Motorista" />
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
 
+        <TextView
+            android:id="@+id/tv_nome_motorista"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:text="Nome do Motorista" />
+    </LinearLayout>
+
+    <!-- Container para Placa do Carro e Número de Vagas -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end"
+        android:layout_marginStart="8dp">
+
+        <TextView
+            android:id="@+id/tv_placa_carro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:textColor="@android:color/darker_gray"
+            android:text="Placa: ABC1234" />
+
+        <TextView
+            android:id="@+id/tv_num_vagas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:text="Vagas: 3" />
+    </LinearLayout>
+
+    <!-- Botão Aceitar -->
     <Button
         android:id="@+id/btn_aceitar_motorista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Aceitar"
         android:textColor="@android:color/white"
-        android:backgroundTint="@color/design_default_color_primary"
+        android:backgroundTint="?attr/colorPrimary"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:minHeight="0dp"
-        android:minWidth="0dp" />
+        android:minWidth="0dp"
+        android:layout_marginStart="8dp" />
 
 </LinearLayout>
-    

@@ -69,18 +69,15 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
     private ValueEventListener solicitacoesCaronaListener;
     private String currentAcceptedRideId = null;
     private Button btnCancelTrip;
-
-    // Campos para funcionalidade de mapa
     private MapView map;
     private MyLocationNewOverlay mLocationOverlay;
-    private TextView tvTripDetails; // Para exibir detalhes da viagem no mapa
+    private TextView tvTripDetails;
     private final String API_KEY = "5b3ce3597851110001cf624859742347a61f4c38a2cf371021231169"; // Sua chave API
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Configuração do Osmdroid (deve ser feita antes de setContentView)
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
@@ -103,8 +100,8 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
         // Inicialização dos componentes da UI
         recyclerViewPassengerRequests = findViewById(R.id.recyclerViewPassengerRequests);
         tvNoRequests = findViewById(R.id.tvNoRequests);
-        map = findViewById(R.id.map_view_motorista); // Inicialize o MapView
-        tvTripDetails = findViewById(R.id.tvTripDetails); // Inicialize o TextView de detalhes da viagem
+        map = findViewById(R.id.map_view_motorista);
+        tvTripDetails = findViewById(R.id.tvTripDetails);
         btnCancelTrip = findViewById(R.id.btn_cancelar_viagem);
 
         recyclerViewPassengerRequests.setLayoutManager(new LinearLayoutManager(this));
@@ -114,25 +111,24 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
         recyclerViewPassengerRequests.setAdapter(passengerRequestAdapter);
 
         btnCancelTrip.setVisibility(View.GONE);
-        tvTripDetails.setVisibility(View.GONE); // Ocultar detalhes da viagem inicialmente
-        map.setVisibility(View.GONE); // Ocultar mapa inicialmente
+        tvTripDetails.setVisibility(View.GONE);
+        map.setVisibility(View.GONE);
 
         btnCancelTrip.setOnClickListener(v -> cancelCurrentTrip());
 
-        setupMap(); // Configura o mapa
+        setupMap();
 
         listenForPassengerRequests();
         checkActiveRideStatus();
     }
 
-    // Configuração básica do mapa
     private void setupMap() {
         if (map != null) {
             map.setTileSource(TileSourceFactory.MAPNIK);
             map.setMultiTouchControls(true);
             IMapController mapController = map.getController();
             mapController.setZoom(14.5);
-            mapController.setCenter(new GeoPoint(-19.4600, -44.2486)); // Coordenadas de Sete Lagoas, MG
+            mapController.setCenter(new GeoPoint(-19.4600, -44.2486));
 
             mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
             mLocationOverlay.enableMyLocation();
@@ -141,7 +137,6 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
     }
 
     private void listenForPassengerRequests() {
-        // --- MUDANÇA PRINCIPAL AQUI: Remover listener anterior antes de adicionar um novo ---
         if (solicitacoesCaronaListener != null) {
             solicitacoesCaronaRef.removeEventListener(solicitacoesCaronaListener);
             Log.d("TelaMotorista", "Listener de solicitações de carona anterior removido.");
@@ -151,18 +146,18 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("TelaMotorista", "onDataChange - Nova atualização de solicitações.");
-                passengerList.clear(); // Limpa a lista para adicionar os dados atualizados
+                passengerList.clear();
 
                 // Se o motorista já aceitou uma carona, não mostre novas solicitações
                 if (currentAcceptedRideId != null) {
                     Log.d("TelaMotorista", "Motorista tem viagem ativa (" + currentAcceptedRideId + "), ocultando novas solicitações.");
-                    updateUIForActiveRide(); // Garante que a UI esteja correta
-                    return; // Retorna pois não deve processar mais solicitações
+                    updateUIForActiveRide();
+                    return;
                 }
 
                 List<Usuario> newPassengerRequests = new ArrayList<>();
-                final int[] pendingFetches = {0}; // Contador para garantir que todas as buscas de usuário terminem
-                boolean anyPendingRequestsFound = false; // Flag para saber se alguma solicitação "pendente" foi encontrada no loop
+                final int[] pendingFetches = {0};
+                boolean anyPendingRequestsFound = false;
 
                 if (!snapshot.hasChildren()) {
                     Log.d("TelaMotorista", "Nenhuma solicitação encontrada no nó 'solicitacoes_carona'.");
@@ -175,7 +170,6 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
 
                     String status = requestSnapshot.child("status").getValue(String.class);
                     String passengerUid = null;
-                    // --- CORREÇÃO AQUI: Mudado para "passageiroUid" ---
                     DataSnapshot passengerUidChild = requestSnapshot.child("passageiroUid");
 
                     if (passengerUidChild.exists()) {
@@ -241,8 +235,6 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
                     }
                 }
 
-                // Este bloco é executado apenas se NENHUMA solicitação pendente com passengerUid válido
-                // foi encontrada no loop síncrono. Isso evita que updateRequestListUI() seja chamado prematuramente.
                 if (!anyPendingRequestsFound && pendingFetches[0] == 0) {
                     Log.d("TelaMotorista", "Nenhuma solicitação pendente válida encontrada no loop inicial. Atualizando UI.");
                     updateRequestListUI();
@@ -265,7 +257,7 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
             // Se não há viagem ativa, mostra a lista de solicitações ou a mensagem "nenhuma solicitação"
             map.setVisibility(View.GONE);
             tvTripDetails.setVisibility(View.GONE);
-            btnCancelTrip.setVisibility(View.GONE); // Garante que o botão de cancelar esteja oculto
+            btnCancelTrip.setVisibility(View.GONE);
 
             if (passengerList.isEmpty()) {
                 tvNoRequests.setVisibility(View.VISIBLE);
@@ -331,14 +323,14 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
             recyclerViewPassengerRequests.setVisibility(View.GONE);
             tvNoRequests.setVisibility(View.GONE);
             btnCancelTrip.setVisibility(View.VISIBLE);
-            map.setVisibility(View.VISIBLE); // Mostra o mapa
-            tvTripDetails.setVisibility(View.VISIBLE); // Mostra os detalhes da viagem
+            map.setVisibility(View.VISIBLE);
+            tvTripDetails.setVisibility(View.VISIBLE);
             Toast.makeText(TelaMotorista.this, "Você tem uma viagem ativa. Cancele para ver novas solicitações.", Toast.LENGTH_LONG).show();
             Log.d("TelaMotorista", "UI Atualizada: Mostrando botão de cancelar, ocultando solicitações, mostrando mapa.");
         } else {
             btnCancelTrip.setVisibility(View.GONE);
-            map.setVisibility(View.GONE); // Oculta o mapa
-            tvTripDetails.setVisibility(View.GONE); // Oculta os detalhes da viagem
+            map.setVisibility(View.GONE);
+            tvTripDetails.setVisibility(View.GONE);
             Log.d("TelaMotorista", "UI Atualizada: Ocultando botão de cancelar e mapa. Forçando nova busca de solicitações.");
             listenForPassengerRequests();
         }
@@ -415,15 +407,12 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
         solicitacoesCaronaRef.child(currentAcceptedRideId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Log the raw snapshot to confirm its content
                 Log.d("TelaMotorista", "cancelCurrentTrip - Raw snapshot: " + snapshot.toString());
 
                 if (snapshot.exists()) {
                     String passengerUid;
-                    // --- CORREÇÃO AQUI: Mudado para "passageiroUid" ---
                     DataSnapshot passengerUidChild = snapshot.child("passageiroUid");
 
-                    // Robust extraction of passengerUid
                     if (passengerUidChild.exists()) {
                         Object rawValue = passengerUidChild.getValue();
                         if (rawValue instanceof String) {
@@ -480,7 +469,7 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
                                 btnCancelTrip.setEnabled(true);
                             });
                 } else {
-                    Log.e("TelaMotorista", "cancelCurrentTrip - Snapshot does not exist for rideId: " + currentAcceptedRideId);
+                    Log.e("TelaMotorista", "Cancelar viagem: Não tem snapshot para o id da viagem " + currentAcceptedRideId);
                     Toast.makeText(TelaMotorista.this, "Viagem ativa não encontrada para cancelar.", Toast.LENGTH_SHORT).show();
                     currentAcceptedRideId = null;
                     btnCancelTrip.setEnabled(true);
@@ -496,7 +485,6 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
         });
     }
 
-    // --- Métodos de Mapa ---
 
     private void displayAcceptedRideOnMap(String origem, String destino) {
         tvTripDetails.setText(String.format("Viagem: %s -> %s", origem, destino));
@@ -644,15 +632,15 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
 
     private void clearMap() {
         if (map != null) {
-            map.getOverlays().clear(); // Limpa todos os overlays (rotas e marcadores)
-            mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map); // Recria o overlay de localização
+            map.getOverlays().clear();
+            mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
             mLocationOverlay.enableMyLocation();
-            map.getOverlays().add(mLocationOverlay); // Adiciona de volta o overlay de localização
-            map.invalidate(); // Força a redesenhar
+            map.getOverlays().add(mLocationOverlay);
+            map.invalidate();
         }
     }
 
-    // --- Ciclo de vida da Activity para o mapa ---
+    // Ciclo de vida da Activity para o mapa
     @Override
     protected void onResume() {
         super.onResume();
@@ -660,7 +648,7 @@ public class TelaMotorista extends AppCompatActivity implements OnAcceptRideClic
             map.onResume();
             if (mLocationOverlay != null) {
                 mLocationOverlay.enableMyLocation();
-                mLocationOverlay.enableFollowLocation(); // Opcional: faz o mapa seguir a localização do motorista
+                mLocationOverlay.enableFollowLocation();
             }
         }
     }

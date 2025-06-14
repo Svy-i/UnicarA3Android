@@ -5,16 +5,18 @@ public class Carro {
     private String placa;
     private String cor;
     private int ano;
+    private int numVagas;
 
     public Carro() {
     }
 
     //Construtor completo
-    public Carro(String modelo, String placa, String cor, int ano) {
+    public Carro(String modelo, String placa, String cor, int ano, int numVagas) {
         this.modelo = modelo;
         this.placa = placa;
         this.cor = cor;
         this.ano = ano;
+        this.numVagas = numVagas;
     }
 
     public String getModelo(){
@@ -33,6 +35,10 @@ public class Carro {
         return ano;
     }
 
+    public int getNumVagas() {
+        return numVagas;
+    }
+
     public void setModelo(String modelo) {
         this.modelo = modelo;
     }
@@ -47,5 +53,9 @@ public class Carro {
 
     public void setAno(int ano) {
         this.ano = ano;
+    }
+
+    public void setNumVagas(int numVagas) {
+        this.numVagas = numVagas;
     }
 }

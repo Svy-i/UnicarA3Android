@@ -80,7 +80,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.41000003" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <Button
         android:id="@+id/bt_deslogar"
         style="@style/Button"
         android:layout_width="0dp"
@@ -91,7 +91,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bt_confirmar_edicao" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <Button
         android:id="@+id/bt_confirmar_edicao"
         style="@style/Button"
         android:layout_width="0dp"

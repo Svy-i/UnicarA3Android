@@ -84,8 +84,8 @@
         app:layout_constraintStart_toStartOf="@+id/v_container_components"
         app:layout_constraintTop_toBottomOf="@+id/et_senha_cadastro" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/bt_cadastro"
+    <Button
+        android:id="@+id/btn_cadastro"
         style="@style/Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

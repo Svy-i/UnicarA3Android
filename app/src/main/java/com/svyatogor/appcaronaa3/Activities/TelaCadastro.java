@@ -47,7 +47,7 @@ public class TelaCadastro extends AppCompatActivity {
         Cadastrar();
     } // fim do onCreate
     private void iniciarComponentes(){
-        btCadastro = findViewById(R.id.bt_cadastro);
+        btCadastro = findViewById(R.id.btn_cadastro);
         etNomeCadastro = findViewById(R.id.et_nome_cadastro);
         etEmailCadastro = findViewById(R.id.et_email_cadastro);
         etSenhaCadastro = findViewById(R.id.et_senha_cadastro);

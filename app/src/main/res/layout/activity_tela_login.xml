@@ -71,8 +71,8 @@
             android:clickable="true"
             android:focusable="true" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/bt_entrar"
+        <Button
+            android:id="@+id/btn_entrar"
             style="@style/Button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

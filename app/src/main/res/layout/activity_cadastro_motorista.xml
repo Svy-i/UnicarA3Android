@@ -11,7 +11,7 @@
     <View
         android:id="@+id/v_container_components"
         style="@style/ContainerComponents"
-        android:layout_height="300dp"
+        android:layout_height="370dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
@@ -40,6 +40,8 @@
         android:hint="Modelo do Carro"
         android:inputType="textCapWords"
         android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@id/v_container_components"
+        app:layout_constraintStart_toStartOf="@id/v_container_components"
         app:layout_constraintTop_toTopOf="@+id/v_container_components" />
 
     <EditText
@@ -48,6 +50,8 @@
         android:hint="Placa do Carro (Ex: ABC1234)"
         android:inputType="textCapCharacters"
         android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@id/v_container_components"
+        app:layout_constraintStart_toStartOf="@id/v_container_components"
         app:layout_constraintTop_toBottomOf="@id/et_modelo_carro" />
 
     <EditText
@@ -56,6 +60,8 @@
         android:hint="Cor do Carro"
         android:inputType="textCapWords"
         android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@id/v_container_components"
+        app:layout_constraintStart_toStartOf="@id/v_container_components"
         app:layout_constraintTop_toBottomOf="@id/et_placa_carro" />
 
     <EditText
@@ -65,9 +71,22 @@
         android:inputType="number"
         android:maxLength="4"
         android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@id/v_container_components"
+        app:layout_constraintStart_toStartOf="@id/v_container_components"
         app:layout_constraintTop_toBottomOf="@id/et_cor_carro" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <EditText
+        android:id="@+id/et_num_vagas"
+        style="@style/Edit_Text"
+        android:hint="Número de Vagas"
+        android:inputType="number"
+        android:maxLength="1"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@id/v_container_components"
+        app:layout_constraintStart_toStartOf="@id/v_container_components"
+        app:layout_constraintTop_toBottomOf="@id/et_ano_carro" /> <!-- New EditText for number of seats -->
+
+    <Button
         android:id="@+id/btn_cadastrar_motorista"
         style="@style/Button"
         android:layout_width="0dp"

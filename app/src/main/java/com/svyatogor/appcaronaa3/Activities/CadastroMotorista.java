@@ -24,13 +24,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.svyatogor.appcaronaa3.Model.Carro;
-import com.svyatogor.appcaronaa3.Model.Usuario;
+import com.svyatogor.appcaronaa3.Model.Carro; // Assuming this model exists or will be created
+import com.svyatogor.appcaronaa3.Model.Usuario; // Assuming this model exists
 import com.svyatogor.appcaronaa3.R;
 
 public class CadastroMotorista extends AppCompatActivity {
 
-    private EditText etModeloCarro, etPlacaCarro, etCorCarro, etAnoCarro;
+    private EditText etModeloCarro, etPlacaCarro, etCorCarro, etAnoCarro, etNumVagas;
     private Button btnCadastrar;
 
     private FirebaseAuth auth;
@@ -77,6 +77,7 @@ public class CadastroMotorista extends AppCompatActivity {
         etPlacaCarro = findViewById(R.id.et_placa_carro);
         etCorCarro = findViewById(R.id.et_cor_carro);
         etAnoCarro = findViewById(R.id.et_ano_carro);
+        etNumVagas = findViewById(R.id.et_num_vagas);
         btnCadastrar = findViewById(R.id.btn_cadastrar_motorista);
     }
 
@@ -85,9 +86,11 @@ public class CadastroMotorista extends AppCompatActivity {
         String placaCarro = etPlacaCarro.getText().toString().trim();
         String corCarro = etCorCarro.getText().toString().trim();
         String anoCarroStr = etAnoCarro.getText().toString().trim();
+        String numVagasStr = etNumVagas.getText().toString().trim();
 
         if (TextUtils.isEmpty(modeloCarro) || TextUtils.isEmpty(placaCarro) ||
-                TextUtils.isEmpty(corCarro) || TextUtils.isEmpty(anoCarroStr)) {
+                TextUtils.isEmpty(corCarro) || TextUtils.isEmpty(anoCarroStr) ||
+                TextUtils.isEmpty(numVagasStr)) {
             Toast.makeText(this, "Por favor, preencha todos os campos do veículo.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -104,13 +107,25 @@ public class CadastroMotorista extends AppCompatActivity {
             return;
         }
 
+        int numVagas;
+        try {
+            numVagas = Integer.parseInt(numVagasStr);
+            if (numVagas < 1 || numVagas > 3) {
+                Toast.makeText(this, "Número de vagas inválido (deve ser entre 1 e 3).", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Número de vagas inválido. Use apenas números.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         database.child("usuarios").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     Usuario usuarioExistente = dataSnapshot.getValue(Usuario.class);
                     if (usuarioExistente != null) {
-                        Carro carro = new Carro(modeloCarro, placaCarro, corCarro, anoCarro);
+                        Carro carro = new Carro(modeloCarro, placaCarro, corCarro, anoCarro, numVagas);
 
                         usuarioExistente.setDriver(true);
                         usuarioExistente.setCarro(carro);

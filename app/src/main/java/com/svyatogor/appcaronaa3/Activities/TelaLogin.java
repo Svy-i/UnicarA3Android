@@ -66,7 +66,7 @@ public class TelaLogin extends AppCompatActivity {
     private void inicializarComponentes(){
         tvCadastro = findViewById(R.id.tv_cadastro);
         tvEsqueciSenha = findViewById(R.id.tv_esqueci_senha);
-        btEntrar = findViewById(R.id.bt_entrar);
+        btEntrar = findViewById(R.id.btn_entrar);
         etEmail = findViewById(R.id.et_email);
         etSenha = findViewById(R.id.et_senha);
         icSenhaVisibilidade = findViewById(R.id.ic_password_toggle);

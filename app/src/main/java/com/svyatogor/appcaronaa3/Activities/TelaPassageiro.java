@@ -64,7 +64,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class TelaPassageiro extends AppCompatActivity implements LocationListener, MotoristaAdapter.OnAceitarClickListener {
+public class TelaPassageiro extends AppCompatActivity implements LocationListener, MotoristaAdapter.OnMotoristaActionListener {
 
     private MapView map;
     private MyLocationNewOverlay mLocationOverlay;
@@ -73,7 +73,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     private Button btnSolicitarCarona;
     private ListView lvMotoristas;
     private TextView tvMotoristasDisponiveis;
-    private TextView tvStatusCarona; // Novo TextView para exibir o status da carona
+    private TextView tvStatusCarona;
 
     private LocationManager locationManager;
     private GeoPoint currentLocation;
@@ -94,8 +94,8 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     private Runnable etOrigemDebounceRunnable, etDestinoDebounceRunnable;
     private static final long ET_DEBOUNCE_DELAY_MS = 1000;
 
-    private String currentRideRequestId = null; // ID da solicitação de carona atual do passageiro
-    private ValueEventListener rideRequestListener; // Listener para a solicitação de carona
+    private String currentRideRequestId = null;
+    private ValueEventListener rideRequestListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,7 +230,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         etOrigem.setVisibility(View.GONE);
         etDestino.setVisibility(View.GONE);
         btnSolicitarCarona.setVisibility(View.GONE);
-        tvMotoristasDisponiveis.setVisibility(View.GONE); // Garante que a lista não esteja visível
+        tvMotoristasDisponiveis.setVisibility(View.GONE);
         lvMotoristas.setVisibility(View.GONE);
 
         // Exibe a mensagem de status
@@ -241,16 +241,15 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         currentRideRequestId = databaseReference.child("solicitacoes_carona").push().getKey();
         if (currentRideRequestId != null) {
             Map<String, Object> solicitacaoCarona = new HashMap<>();
-            solicitacaoCarona.put("passageiroUid", user.getUid()); // Agora com verificação de null
+            solicitacaoCarona.put("passageiroUid", user.getUid());
             solicitacaoCarona.put("origem", origem);
             solicitacaoCarona.put("destino", destino);
-            solicitacaoCarona.put("status", "pendente"); // Status inicial
+            solicitacaoCarona.put("status", "pendente");
             solicitacaoCarona.put("timestamp", System.currentTimeMillis());
 
             databaseReference.child("solicitacoes_carona").child(currentRideRequestId).setValue(solicitacaoCarona)
                     .addOnSuccessListener(aVoid -> {
                         Log.d("TelaPassageiro", "Solicitação de carona enviada. ID: " + currentRideRequestId + " Passageiro UID: " + user.getUid());
-                        // Inicia a escuta para o status desta solicitação
                         listenForRideRequestStatus(currentRideRequestId);
                     })
                     .addOnFailureListener(e -> {
@@ -263,7 +262,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             resetPassengerUI(); // Em caso de erro, resetar a UI
         }
 
-        // Desenhar a rota no mapa (opcional, pode ser feito após aceitação)
         buscarCoordenadas(origem, destino);
     }
 
@@ -319,7 +317,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                     Toast.makeText(TelaPassageiro.this, "Sua solicitação de carona não existe mais.", Toast.LENGTH_LONG).show();
                     resetPassengerUI();
                 }
-                // Adicione outras condições de status se necessário (ex: "in_progress", "completed")
             }
 
             @Override
@@ -331,8 +328,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         };
         databaseReference.child("solicitacoes_carona").child(requestId).addValueEventListener(rideRequestListener);
     }
-
-    // Método para resetar a UI do passageiro para o estado inicial de solicitação
     private void resetPassengerUI() {
         tvStatusCarona.setVisibility(View.GONE);
         tvMotoristasDisponiveis.setVisibility(View.GONE);
@@ -428,9 +423,8 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     private GeoPoint geocodificar(String endereco) throws IOException {
         OkHttpClient client = new OkHttpClient();
         String encodedAddress = java.net.URLEncoder.encode(endereco, "UTF-8");
-        String url = "https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s"; // Use %s para formatar
+        String url = "https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s";
 
-        // Use String.format para injetar a API_KEY e o endereço codificado
         String finalUrl = String.format(Locale.US, url, API_KEY, encodedAddress);
 
         Log.d("GEOCODIFICAR_URL", finalUrl);

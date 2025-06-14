@@ -86,7 +86,7 @@ public class PerfilUser extends AppCompatActivity {
                         bitmap = BitmapFactory.decodeFile(currentPhotoPath);
                     } catch (OutOfMemoryError e) {
                         Toast.makeText(this, "Erro: Imagem muito grande para carregar.", Toast.LENGTH_LONG).show();
-                        Log.e("PerfilUser", "OutOfMemoryError ao decodificar bitmap: " + e.getMessage(), e);
+                        Log.e("PerfilUser", "Falta de memória ao decodificar bitmap: " + e.getMessage(), e);
                         return;
                     }
 
