@@ -1,4 +1,4 @@
-package com.svyatogor.appcaronaa3.Model;
+package com.svyatogor.appcaronaa3.Adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.svyatogor.appcaronaa3.Interfaces.OnAcceptRideClickListener;
+import com.svyatogor.appcaronaa3.Model.Usuario;
 import com.svyatogor.appcaronaa3.R;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class PassengerRequestAdapter extends RecyclerView.Adapter<PassengerReque
     public void onBindViewHolder(@NonNull PassengerRequestViewHolder holder, int position) {
         Usuario passenger = passageirosLista.get(position);
         holder.tvPassengerName.setText(passenger.getNome());
-        holder.tvPickupLocation.setText("Partida: " + passenger.getPontoDeChegada());
+        holder.tvPickupLocation.setText("Partida: " + passenger.getOrigem());
         holder.tvDestination.setText("Destino: " + passenger.getDestino());
 
         // Opcional: Se você tiver a distância, defina e torne visível

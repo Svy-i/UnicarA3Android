@@ -5,99 +5,81 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@drawable/background"
     tools:context=".Activities.CadastroMotorista">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+    <View
+        android:id="@+id/v_container_components"
+        style="@style/ContainerComponents"
+        android:layout_height="300dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        app:layout_constraintVertical_bias="0.19999999" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Dados do Veículo"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dados do Veículo do Motorista"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_marginBottom="24dp"
-                android:layout_marginTop="16dp" />
+    <EditText
+        android:id="@+id/et_modelo_carro"
+        style="@style/Edit_Text"
+        android:hint="Modelo do Carro"
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        app:layout_constraintTop_toTopOf="@+id/v_container_components" />
 
-            <!-- Vehicle Information -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_modelo_carro"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Modelo do Carro"
-                    android:inputType="textCapWords"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/et_placa_carro"
+        style="@style/Edit_Text"
+        android:hint="Placa do Carro (Ex: ABC1234)"
+        android:inputType="textCapCharacters"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/et_modelo_carro" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_placa_carro"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Placa do Carro (Ex: ABC1234)"
-                    android:inputType="textCapCharacters"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/et_cor_carro"
+        style="@style/Edit_Text"
+        android:hint="Cor do Carro"
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/et_placa_carro" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_cor_carro"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Cor do Carro"
-                    android:inputType="textCapWords"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/et_ano_carro"
+        style="@style/Edit_Text"
+        android:hint="Ano do Carro (Ex: 2020)"
+        android:inputType="number"
+        android:maxLength="4"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/et_cor_carro" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_ano_carro"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Ano do Carro (Ex: 2020)"
-                    android:inputType="number"
-                    android:maxLength="4"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_cadastrar_motorista"
+        style="@style/Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="Registrar como Motorista"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/v_container_components" />
 
-            <Button
-                android:id="@+id/btn_cadastrar_motorista"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Registrar como Motorista"
-                android:padding="12dp"
-                android:textSize="18sp"
-                android:backgroundTint="@color/design_default_color_primary"
-                android:textColor="@color/white" />
-
-        </LinearLayout>
-    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

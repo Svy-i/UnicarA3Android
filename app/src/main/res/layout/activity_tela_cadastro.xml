@@ -11,10 +11,10 @@
     <View
         android:id="@+id/v_container_components"
         style="@style/ContainerComponents"
+        android:layout_height="300dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="16dp"
-        android:layout_height="340dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_titulo_cadastro" />
@@ -39,8 +39,6 @@
         android:drawableRight="@drawable/ic_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:ems="10"
         android:hint="Email"
         android:inputType="textEmailAddress"
@@ -54,8 +52,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:hint="Nome"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="@id/v_container_components"
@@ -69,10 +65,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:hint="Senha"
-        android:inputType="text"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="@+id/v_container_components"
         app:layout_constraintStart_toStartOf="@+id/v_container_components"
         app:layout_constraintTop_toBottomOf="@+id/et_email_cadastro" />
@@ -81,10 +75,13 @@
     <EditText
         android:id="@+id/et_telefone_cadastro"
         style="@style/Edit_Text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:drawableRight="@drawable/ic_add_phone"
+        android:inputType="phone"
         android:hint="Telefone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/v_container_components"
+        app:layout_constraintStart_toStartOf="@+id/v_container_components"
         app:layout_constraintTop_toBottomOf="@+id/et_senha_cadastro" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -93,10 +90,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
-        android:padding="25dp"
+        android:padding="20dp"
         android:text="Cadastrar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/v_container_components" />

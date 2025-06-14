@@ -2,14 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
+    <uses-feature android:name="android.hardware.camera"/>
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -31,19 +26,7 @@
         <activity
             android:name=".Activities.CadastroMotorista"
             android:exported="false" />
-        <activity
-            android:name=".Activities.MapFragment"
-            android:exported="false" />
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="br.com.svyatogor.appcaronaa3.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="br.com.svyatogor.appcaronaa3.fileprovider"

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.core.widget.NestedScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,108 +6,124 @@
     android:fillViewport="true"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background"
-    tools:context=".Activities.TelaLogin">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        tools:context=".Activities.TelaLogin">
 
-    <View
-        android:id="@+id/v_container_components"
-        style="@style/ContainerComponents"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <View
+            android:id="@+id/v_container_components"
+            style="@style/ContainerComponents"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/et_email"
-        style="@style/Edit_Text"
-        android:drawableRight="@drawable/ic_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="Email"
-        android:textColor="@color/black"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="@+id/v_container_components"
-        app:layout_constraintStart_toStartOf="@+id/v_container_components"
-        app:layout_constraintTop_toTopOf="@+id/v_container_components" />
+        <EditText
+            android:id="@+id/et_email"
+            style="@style/Edit_Text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:ems="10"
+            android:hint="Email"
+            android:textColor="@color/black"
+            android:inputType="textEmailAddress"
+            app:layout_constraintEnd_toEndOf="@+id/v_container_components"
+            app:layout_constraintStart_toStartOf="@+id/v_container_components"
+            app:layout_constraintTop_toTopOf="@+id/v_container_components" />
 
-    <EditText
-        android:id="@+id/et_senha"
-        style="@style/Edit_Text"
-        android:drawableRight="@drawable/ic_eye"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="Senha"
-        android:textColor="@color/black"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/v_container_components"
-        app:layout_constraintStart_toStartOf="@+id/v_container_components"
-        app:layout_constraintTop_toBottomOf="@+id/et_email" />
+        <ImageView
+            android:id="@+id/ic_email"
+            style="@style/Icon"
+            android:src="@drawable/ic_email"
+            app:layout_constraintTop_toTopOf="@+id/et_email"
+            app:layout_constraintBottom_toBottomOf="@+id/et_email"
+            app:layout_constraintEnd_toEndOf="@+id/et_email" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/bt_entrar"
-        style="@style/Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="15dp"
-        android:padding="25dp"
-        android:text="@string/entrar"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/v_container_components"
-        app:layout_constraintEnd_toEndOf="@+id/v_container_components"
-        app:layout_constraintStart_toStartOf="@+id/v_container_components"
-        app:layout_constraintTop_toBottomOf="@+id/et_senha" />
+        <EditText
+            android:id="@+id/et_senha"
+            style="@style/Edit_Text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:ems="10"
+            android:hint="Senha"
+            android:textColor="@color/black"
+            android:inputType="textPassword"
+            app:layout_constraintEnd_toEndOf="@+id/v_container_components"
+            app:layout_constraintStart_toStartOf="@+id/v_container_components"
+            app:layout_constraintTop_toBottomOf="@+id/et_email" />
 
-    <TextView
-        android:id="@+id/tv_cadastro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/textView_cadastro"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/v_container_components" />
+        <ImageView
+            android:id="@+id/ic_password_toggle"
+            style="@style/Icon"
+            android:src="@drawable/ic_eye"
+            app:layout_constraintEnd_toEndOf="@id/et_senha"
+            app:layout_constraintTop_toTopOf="@id/et_senha"
+            app:layout_constraintBottom_toBottomOf="@id/et_senha"
+            android:clickable="true"
+            android:focusable="true" />
 
-    <TextView
-        android:id="@+id/tv_esqueci_senha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Esqueci minha senha"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_cadastro" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/bt_entrar"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="15dp"
+            android:padding="25dp"
+            android:text="@string/entrar"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/v_container_components"
+            app:layout_constraintEnd_toEndOf="@+id/v_container_components"
+            app:layout_constraintStart_toStartOf="@+id/v_container_components"
+            app:layout_constraintTop_toBottomOf="@+id/et_senha" />
 
-    <TextView
-        android:id="@+id/textView3"
-        style="@style/tv_Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="UniCar"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@+id/v_container_components"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/tv_cadastro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/textView_cadastro"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/v_container_components" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_esqueci_senha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Esqueci minha senha"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_cadastro" />
+
+        <TextView
+            android:id="@+id/textView3"
+            style="@style/tv_Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="UniCar"
+            android:textSize="34sp"
+            app:layout_constraintBottom_toTopOf="@+id/v_container_components"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

@@ -15,7 +15,7 @@ public class Cloudinary extends Application {
         // Configurações do Cloudinary
         Map config = new HashMap();
 
-        config.put("cloud_name", "Root");
+        config.put("cloud_name", "dljy91pou");
         config.put("api_key", "236263628567759");
         config.put("api_secret", "lLYg-1T0bFwnQQ5fIOfI2fYXg90@dljy91pou");
 

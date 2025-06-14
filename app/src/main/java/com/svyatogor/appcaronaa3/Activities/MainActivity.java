@@ -2,28 +2,34 @@ package com.svyatogor.appcaronaa3.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.svyatogor.appcaronaa3.R;
+import com.svyatogor.appcaronaa3.Model.Usuario;
 
 public class MainActivity extends AppCompatActivity {
 
-    /*private EditText etOrigem1, etDestino1, etData, etnVagas;
-    private Button btPublicarCarona;
-    private EditText etOrigem2, etDestino2;
-    private Button btBuscarCarona;
-    private ImageView icUserMain;*/
     private Button btnEntrarMotorista;
     private Button btnEntrarPassageiro;
+
+    private FirebaseAuth auth;
+    private DatabaseReference usersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,75 +43,56 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        //iniciarComponentes();
-        //configurarBotoes();
+        // Inicializa o Firebase
+        auth = FirebaseAuth.getInstance();
+        usersRef = FirebaseDatabase.getInstance().getReference("usuarios");
+
         btnEntrarMotorista = findViewById(R.id.btn_entrar_motorista);
         btnEntrarPassageiro = findViewById(R.id.btn_entrar_passageiro);
-        btnEntrarMotorista.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, CadastroMotorista.class));
-        });
+
+        btnEntrarMotorista.setOnClickListener(v -> verificarMotoristaStatus()); // Chama o método de verificar status do motorista
         btnEntrarPassageiro.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, TelaPassageiro.class));
         });
     }
 
-    /*private void iniciarComponentes() {
-        // Motorista
-        etOrigem1 = findViewById(R.id.et_origem1);
-        etDestino1 = findViewById(R.id.et_destino1);
-        etData = findViewById(R.id.et_data);
-        etnVagas = findViewById(R.id.etn_vagas);
-        btPublicarCarona = findViewById(R.id.bt_publicar_carona);
+    private void verificarMotoristaStatus() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        Usuario usuario = snapshot.getValue(Usuario.class);
+                        if (usuario != null && usuario.isDriver()) {
+                            // Usuário é um motorista, vai para TelaMotorista
+                            Toast.makeText(MainActivity.this, "Bem-vindo de volta, " + usuario.getNome() + "!", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(MainActivity.this, TelaMotorista.class));
+                            finish();
+                        } else {
+                            // Usuário não é motorista, vai para CadastroMotorista
+                            Toast.makeText(MainActivity.this, "Por favor, complete seu cadastro de motorista.", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(MainActivity.this, CadastroMotorista.class));
+                        }
+                    } else {
+                        // Não há dados do usuário no nó 'usuarios'
+                        Toast.makeText(MainActivity.this, "Por favor, complete seu cadastro de motorista.", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(MainActivity.this, CadastroMotorista.class));
+                    }
+                }
 
-        // Passageiro
-        etOrigem2 = findViewById(R.id.et_origem2);
-        etDestino2 = findViewById(R.id.et_destino2);
-        btBuscarCarona = findViewById(R.id.bt_buscar_carona);
-
-        //Ícones
-        icUserMain = findViewById(R.id.ic_user_main);
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("MainActivity", "Erro ao verificar status do motorista: " + error.getMessage());
+                    Toast.makeText(MainActivity.this, "Erro ao verificar status. Tente novamente.", Toast.LENGTH_SHORT).show();
+                    // Em caso de erro, volta pro cadastro
+                    startActivity(new Intent(MainActivity.this, CadastroMotorista.class));
+                }
+            });
+        } else {
+            // Usuário não logado, redireciona para a tela de login
+            Toast.makeText(this, "Por favor, faça login para continuar como motorista.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, TelaLogin.class));
+        }
     }
-
-    private void configurarBotoes() {
-
-        btPublicarCarona.setOnClickListener(v -> {
-            String origem = etOrigem1.getText().toString();
-            String destino = etDestino1.getText().toString();
-            String data = etData.getText().toString();
-            String vagas = etnVagas.getText().toString();
-
-            if (!origem.isEmpty() && !destino.isEmpty() && !data.isEmpty() && !vagas.isEmpty()) {
-                Intent intent = new Intent(MainActivity.this, TelaMotorista.class);
-                intent.putExtra("tipo_usuario", "motorista");
-                intent.putExtra("origem", origem);
-                intent.putExtra("destino", destino);
-                intent.putExtra("data", data);
-                intent.putExtra("vagas", vagas);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        btBuscarCarona.setOnClickListener(v -> {
-            String origem = etOrigem2.getText().toString();
-            String destino = etDestino2.getText().toString();
-
-            if (!origem.isEmpty() && !destino.isEmpty()) {
-                Intent intent = new Intent(MainActivity.this, TelaPassageiro.class);
-                intent.putExtra("tipo_usuario", "passageiro");
-                intent.putExtra("origem", origem);
-                intent.putExtra("destino", destino);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Preencha origem e destino!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        icUserMain.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, PerfilUser.class);
-            startActivity(intent);
-        });
-    }*/
 }

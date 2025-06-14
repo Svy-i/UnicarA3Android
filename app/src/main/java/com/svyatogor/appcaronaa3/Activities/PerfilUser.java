@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -39,71 +38,71 @@ import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import com.svyatogor.appcaronaa3.Model.Usuario;
 import com.svyatogor.appcaronaa3.R;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PerfilUser extends AppCompatActivity {
-
-    Cloudinary cloudinary = new Cloudinary();
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
-    private static final String KEY_PHOTO_PATH = "photo_path"; // Adicione esta constante
+    private static final String KEY_PHOTO_PATH = "photo_path";
     private String currentPhotoPath;
     private TextView tvNomePerfil;
     private TextView tvEmailPerfil;
     private ImageView ivEditTelefone;
     private ImageView ivEditFoto;
     private ImageView ivFoto;
+    private EditText etEditTelefone;
 
+    private Usuario usuario;
 
-    // Definindo o ActivityResultLauncher para capturar fotos
+    private DatabaseReference databaseReference; // Referência para o Realtime Database
+
+    // Activity para captura de foto
     private final ActivityResultLauncher<Intent> capturarFoto = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-
                 if (result.getResultCode() == RESULT_OK) {
-                    // **1. Verifique se currentPhotoPath não é nulo ANTES de usar**
                     if (currentPhotoPath == null || currentPhotoPath.isEmpty()) {
                         Toast.makeText(this, "Erro: Caminho da foto não foi definido.", Toast.LENGTH_LONG).show();
-                        return; // Sair do método se o caminho for nulo
+                        Log.e("PerfilUser", "Erro: currentPhotoPath é nulo ou vazio após a captura.");
+                        return;
                     }
 
-                    // **2. Tente decodificar o Bitmap**
-                    Bitmap bitmap = null;
+                    Bitmap bitmap;
                     try {
                         bitmap = BitmapFactory.decodeFile(currentPhotoPath);
                     } catch (OutOfMemoryError e) {
-                        // Lidar com OutOfMemoryError para imagens muito grandes
                         Toast.makeText(this, "Erro: Imagem muito grande para carregar.", Toast.LENGTH_LONG).show();
-                        e.printStackTrace();
-                        return; // Sair do método
+                        Log.e("PerfilUser", "OutOfMemoryError ao decodificar bitmap: " + e.getMessage(), e);
+                        return;
                     }
 
-
-                    // **3. Verifique se o Bitmap foi decodificado com sucesso**
                     if (bitmap == null) {
                         Toast.makeText(this, "Erro: Não foi possível decodificar a imagem capturada.", Toast.LENGTH_LONG).show();
-                        // Opcional: tentar carregar de outra forma ou informar ao usuário
-                        return; // Sair do método se o bitmap for nulo
+                        Log.e("PerfilUser", "Erro: Bitmap decodificado é nulo.");
+                        return;
                     }
 
-                    // **4. Corrigir a rotação da imagem e exibi-la**
-                    // Chame rotacionarImagem APENAS se o bitmap e currentPhotoPath forem válidos
                     Bitmap rotatedBitmap = rotacionarImagem(bitmap, currentPhotoPath);
                     ivFoto.setImageBitmap(rotatedBitmap);
 
-                    // **5. Faça o upload para o Cloudinary (apenas se tudo acima deu certo)**
                     uploadImageToCloudinary(new File(currentPhotoPath));
 
                 } else {
-                    // Usuário cancelou a câmera ou ocorreu um erro na câmera
                     Toast.makeText(PerfilUser.this, "Captura de imagem cancelada ou falhou.", Toast.LENGTH_SHORT).show();
-                    // É crucial limpar currentPhotoPath aqui para evitar usar um caminho inválido depois
                     currentPhotoPath = null;
                 }
             }
@@ -119,88 +118,132 @@ public class PerfilUser extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        iniciarComponentes();
-        editarTelefone();
 
-        // Adicione esta linha para carregar a imagem do perfil
-        // Obtenha o ID do usuário logado para carregar a imagem dele
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            loadUserProfileImage(currentUser.getUid());
+        iniciarComponentes();
+
+        // Inicializa a referência para o Realtime Database
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        if (savedInstanceState != null) {
+            currentPhotoPath = savedInstanceState.getString(KEY_PHOTO_PATH);
+            if (currentPhotoPath != null && !currentPhotoPath.isEmpty()) {
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+                    if (bitmap != null) {
+                        ivFoto.setImageBitmap(rotacionarImagem(bitmap, currentPhotoPath));
+                    }
+                } catch (Exception e) {
+                    Log.e("PerfilUser", "Erro ao carregar foto restaurada: " + e.getMessage());
+                }
+            }
         }
 
+        usuario = new Usuario();
+        carregarDadosDoUsuario();
 
-        // Ao clicar na ImageView, a câmera é aberta
         ivEditFoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(PerfilUser.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-
-                    // Se a permissão de câmera ou de gravação não foi concedida, solicite-as
+                if (ContextCompat.checkSelfPermission(PerfilUser.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(PerfilUser.this, new String[]{
                             Manifest.permission.CAMERA
                     }, CAMERA_PERMISSION_REQUEST_CODE);
                 } else {
-                    // Se as permissões já foram concedidas, abra a câmera
                     abrirCamera();
                 }
             }
         });
-        if (savedInstanceState != null) {
-            currentPhotoPath = savedInstanceState.getString(KEY_PHOTO_PATH);
-        }
-        carregarDadosDoUsuario();
-    } // fim do onCreate()
-
-    private void carregarDadosDoUsuario() {
-        // Exemplo: pegando o usuário logado ou passando via Intent
-        // FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl()
-        // Ou de um objeto Usuario que você carregou do Firestore:
-        // Usuario usuarioAtual = ... // Carregue seu objeto Usuario
-
-        String fotoUrl = null; // Inicialize como null
-
-        // *** PONTO CRÍTICO: Verifique de onde vem a URL da foto ***
-        // Se for do Firebase Auth:
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            if (FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null) {
-                fotoUrl = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
-            }
-        }
-        // Ou se for do seu objeto Usuario do Firestore:
-        // if (usuarioAtual != null && usuarioAtual.getFotoPerfilUrl() != null) {
-        //     fotoUrl = usuarioAtual.getFotoPerfilUrl();
-        // }
-
-
-        // *** AQUI É ONDE O ERRO PROVAVELMENTE ACONTECE SEM A VERIFICAÇÃO ***
-        if (fotoUrl != null && !fotoUrl.isEmpty()) {
-            // Se você usa Glide:
-            Glide.with(this)
-                    .load(fotoUrl)
-                    .placeholder(R.drawable.ic_user) // Imagem padrão enquanto carrega
-                    .error(R.drawable.ic_launcher_background) // Imagem se houver erro
-                    .into(ivFoto);
-        } else {
-            // Se a URL for nula ou vazia, defina uma imagem padrão
-            ivFoto.setImageResource(R.drawable.ic_user);
-            Log.w("PerfilUser", "URL da foto de perfil é nula ou vazia. Usando imagem padrão.");
-        }
     }
 
-    // Adicione este método à sua classe PerfilUser
+    private void carregarDadosDoUsuario() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Usuário não autenticado. Redirecionando para o login.", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, TelaLogin.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        // Usa Realtime Database para carregar dados do usuário
+        databaseReference.child("usuarios").child(currentUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // Mapeia os dados do Realtime Database para o objeto Usuario
+                            Usuario userFromDb = snapshot.getValue(Usuario.class);
+                            if (userFromDb != null) {
+                                usuario = userFromDb;
+                                tvNomePerfil.setText(usuario.getNome());
+                                tvEmailPerfil.setText(usuario.getEmail());
+                                etEditTelefone.setText(usuario.getTelefone());
+
+                                String fotoUrl = usuario.getFotoPerfilUrl();
+                                if (fotoUrl != null && !fotoUrl.isEmpty()) {
+                                    if (fotoUrl.startsWith("http://")) {
+                                        fotoUrl = fotoUrl.replace("http://", "https://");
+                                    }
+                                    Glide.with(PerfilUser.this)
+                                            .load(fotoUrl)
+                                            .placeholder(R.drawable.ic_user)
+                                            .error(R.drawable.ic_launcher_background)
+                                            .into(ivFoto);
+                                } else {
+                                    ivFoto.setImageResource(R.drawable.ic_user);
+                                    Log.w("PerfilUser", "URL da foto de perfil é nula ou vazia. Usando imagem padrão.");
+                                }
+                            } else {
+                                Log.e("PerfilUser", "Erro ao converter snapshot para objeto Usuario. Objeto nulo.");
+                                exibirDadosPadrao(currentUser.getEmail());
+                            }
+                        } else {
+                            Log.d("PerfilUser", "Documento do usuário não encontrado no Realtime Database. Criando perfil básico.");
+                            usuario = new Usuario();
+                            usuario.setUid(currentUser.getUid());
+                            usuario.setEmail(currentUser.getEmail());
+                            usuario.setNome("Novo Usuário");
+                            usuario.setTelefone("Não definido");
+
+                            // Salva o perfil básico no Realtime Database
+                            databaseReference.child("usuarios").child(currentUser.getUid()).setValue(usuario)
+                                    .addOnSuccessListener(aVoid -> Log.d("PerfilUser", "Perfil básico criado no Realtime Database."))
+                                    .addOnFailureListener(e -> Log.e("PerfilUser", "Erro ao criar perfil básico: " + e.getMessage()));
+
+                            exibirDadosPadrao(currentUser.getEmail());
+                        }
+                        editarTelefone();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(PerfilUser.this, "Erro ao carregar dados do usuário: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("PerfilUser", "Erro ao carregar dados do usuário do Realtime Database", error.toException());
+                        exibirDadosPadrao(currentUser.getEmail());
+                    }
+                });
+    }
+
+    private void exibirDadosPadrao(String email) {
+        tvNomePerfil.setText("Nome não definido");
+        tvEmailPerfil.setText(email);
+        etEditTelefone.setText("Telefone não definido");
+        ivFoto.setImageResource(R.drawable.ic_user);
+    }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        // Salva o caminho da foto antes que a Activity seja destruída
         if (currentPhotoPath != null) {
-            outState.putString("photo_path", currentPhotoPath); // Use a mesma KEY_PHOTO_PATH
+            outState.putString(KEY_PHOTO_PATH, currentPhotoPath);
         }
     }
 
     private void iniciarComponentes() {
         tvNomePerfil = findViewById(R.id.tv_nome_perfil);
         tvEmailPerfil = findViewById(R.id.tv_email_perfil);
+        etEditTelefone = findViewById(R.id.et_edit_telefone);
         ivEditFoto = findViewById(R.id.iv_edit_foto);
         ivEditTelefone = findViewById(R.id.iv_edit_telefone);
         ivFoto = findViewById(R.id.iv_foto);
@@ -209,21 +252,18 @@ public class PerfilUser extends AppCompatActivity {
     private void abrirCamera() {
         Intent obterFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        // Verifica se há uma atividade de câmera disponível
         if (obterFotoIntent.resolveActivity(getPackageManager()) != null) {
-            // Cria um arquivo temporário para armazenar a imagem
             File photoFile = null;
             try {
                 photoFile = criarArquivoDeImagem();
             } catch (IOException ex) {
-                Toast.makeText(this, "Erro ao criar o arquivo de imagem", Toast.LENGTH_SHORT).show();
-                return; // Sai do método se não conseguir criar o arquivo
+                Toast.makeText(this, "Erro ao criar o arquivo de imagem: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("PerfilUser", "Erro ao criar arquivo de imagem", ex);
+                return;
             }
-            // Prossegue se o arquivo foi criado com sucesso
             if (photoFile != null) {
-                // Aqui está a chamada ao FileProvider com a URI correta
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "br.com.svyatogor.appcaronaa3.fileprovider",  // Use o nome correto do pacote
+                        "br.com.svyatogor.appcaronaa3.fileprovider",
                         photoFile);
 
                 obterFotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
@@ -231,52 +271,50 @@ public class PerfilUser extends AppCompatActivity {
                 obterFotoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 capturarFoto.launch(obterFotoIntent);
             }
+        } else {
+            Toast.makeText(this, "Nenhum aplicativo de câmera encontrado. Por favor, instale um.", Toast.LENGTH_LONG).show();
+            Log.w("PerfilUser", "Nenhum aplicativo de câmera disponível para MediaStore.ACTION_IMAGE_CAPTURE.");
         }
     }
 
-    // Criar arquivo temporário para salvar a foto
     private File criarArquivoDeImagem() throws IOException {
-        // Cria um nome de arquivo único baseado na data
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
-                imageFileName,  // Nome do arquivo
-                ".jpg",         // Extensão
-                storageDir      // Diretório de armazenamento
+                imageFileName,
+                ".jpg",
+                storageDir
         );
         currentPhotoPath = image.getAbsolutePath();
+        Log.d("PerfilUser", "Arquivo de imagem temporário criado: " + currentPhotoPath);
         return image;
     }
 
-    // Tratar a resposta da solicitação de permissão
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permissão concedida, abrir câmera
                 abrirCamera();
             } else {
-                // Permissão negada
-                Toast.makeText(this, "PERMISSÃO DE CÂMERA NEGADA!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "PERMISSÃO DE CÂMERA NEGADA! Não é possível capturar foto.", Toast.LENGTH_LONG).show();
+                Log.w("PerfilUser", "Permissão de câmera negada pelo usuário.");
             }
         }
     }
 
-    // Exibindo a imagem capturada
     private Bitmap rotacionarImagem(Bitmap img, String photoPath) {
-
-        ExifInterface exif; // ExifInterface captura os metadados da foto. É possível saber a orientação por ele.
+        ExifInterface exif;
         try {
             exif = new ExifInterface(photoPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("PerfilUser", "Erro ao ler EXIF para rotação: " + e.getMessage(), e);
             return img;
         }
 
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        Matrix matrix = new Matrix(); // Matrix permite rotacionar a foto.
+        Matrix matrix = new Matrix();
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 matrix.postRotate(90);
@@ -291,118 +329,152 @@ public class PerfilUser extends AppCompatActivity {
                 return img;
         }
 
-        return Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        try {
+            Bitmap rotatedBitmap = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+            img.recycle();
+            return rotatedBitmap;
+        } catch (OutOfMemoryError e) {
+            Log.e("PerfilUser", "OutOfMemoryError ao rotacionar bitmap: " + e.getMessage());
+            Toast.makeText(this, "Erro de memória ao rotacionar imagem.", Toast.LENGTH_SHORT).show();
+            return img;
+        }
     }
 
     public void editarTelefone() {
-        // Variável para controlar o estado de edição
-        final boolean[] editandoTelefone = {false};
+        final boolean[] editandoTelefone = {etEditTelefone.isFocusable()};
 
         ivEditTelefone.setOnClickListener(v -> {
             if (editandoTelefone[0]) {
-                // Desabilita a edição
-                tvNomePerfil.setFocusable(false);
-                tvNomePerfil.setFocusableInTouchMode(false);
-                tvNomePerfil.setClickable(false);
-                tvNomePerfil.setCursorVisible(false);
-                tvNomePerfil.setKeyListener(null);
+                String novoTelefone = etEditTelefone.getText().toString().trim();
+                if (!novoTelefone.isEmpty()) {
+                    salvarTelefone(novoTelefone);
+                } else {
+                    Toast.makeText(this, "Telefone não pode ser vazio.", Toast.LENGTH_SHORT).show();
+                }
+
+                etEditTelefone.setFocusable(false);
+                etEditTelefone.setFocusableInTouchMode(false);
+                etEditTelefone.setClickable(false);
+                etEditTelefone.setCursorVisible(false);
+                etEditTelefone.setKeyListener(null);
             } else {
-                // Habilita a edição
-                tvNomePerfil.setFocusable(true);
-                tvNomePerfil.setFocusableInTouchMode(true);
-                tvNomePerfil.setClickable(true);
-                tvNomePerfil.setCursorVisible(true);
-                tvNomePerfil.setKeyListener(new EditText(this).getKeyListener());
-                tvNomePerfil.requestFocus();
+                etEditTelefone.setFocusable(true);
+                etEditTelefone.setFocusableInTouchMode(true);
+                etEditTelefone.setClickable(true);
+                etEditTelefone.setCursorVisible(true);
+                etEditTelefone.setKeyListener(new EditText(this).getKeyListener());
+                etEditTelefone.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null) {
-                    imm.showSoftInput(tvNomePerfil, InputMethodManager.SHOW_IMPLICIT);
+                    imm.showSoftInput(etEditTelefone, InputMethodManager.SHOW_IMPLICIT);
                 }
             }
-            // Alterna o estado
             editandoTelefone[0] = !editandoTelefone[0];
         });
+
+        etEditTelefone.setFocusable(false);
+        etEditTelefone.setFocusableInTouchMode(false);
+        etEditTelefone.setClickable(false);
+        etEditTelefone.setCursorVisible(false);
+        etEditTelefone.setKeyListener(null);
+    }
+
+    private void salvarTelefone(String novoTelefone) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("telefone", novoTelefone);
+
+            databaseReference.child("usuarios").child(user.getUid()).updateChildren(updates)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Telefone atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+                        if (usuario != null) {
+                            usuario.setTelefone(novoTelefone);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Falha ao atualizar telefone: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("PerfilUser", "Erro ao atualizar telefone no Realtime Database", e);
+                    });
+        }
     }
 
     private void uploadImageToCloudinary(File imageFile) {
+        if (MediaManager.get().getCloudinary() == null || MediaManager.get().getCloudinary().config == null) {
+            Toast.makeText(this, "Erro: Cloudinary não inicializado ou configuração ausente. Verifique a classe Application.", Toast.LENGTH_LONG).show();
+            Log.e("PerfilUser", "MediaManager.get().getCloudinary() ou sua configuração é nula. Cloudinary não inicializado corretamente.");
+            return;
+        }
+
         MediaManager.get().upload(Uri.fromFile(imageFile))
                 .unsigned("meu_preset")
                 .callback(new UploadCallback() {
                     @Override
                     public void onStart(String requestId) {
-                        // Iniciar animação de carregamento
+                        Toast.makeText(PerfilUser.this, "Iniciando upload da imagem...", Toast.LENGTH_SHORT).show();
+                        Log.d("PerfilUser", "Upload Cloudinary iniciado para requestId: " + requestId);
                     }
 
                     @Override
                     public void onProgress(String requestId, long bytes, long totalBytes) {
-                        // Atualizar barra de progresso
+                        Log.d("PerfilUser", "Progresso do upload (" + requestId + "): " + bytes + "/" + totalBytes);
                     }
 
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
                         String imageUrl = (String) resultData.get("url");
-                        // Salvar URL no Firestore
-                        saveImageUrlToFirestore(imageUrl);
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            // NOVO: Assegura que a URL da foto seja HTTPS antes de salvar e usar
+                            if (imageUrl.startsWith("http://")) {
+                                imageUrl = imageUrl.replace("http://", "https://");
+                            }
+                            saveImageUrlToRealtimeDatabase(imageUrl);
+                            Log.d("PerfilUser", "Upload Cloudinary sucesso. URL: " + imageUrl);
+                        } else {
+                            Toast.makeText(PerfilUser.this, "Erro: URL da imagem não retornada pelo Cloudinary.", Toast.LENGTH_LONG).show();
+                            Log.e("PerfilUser", "URL da imagem é nula ou vazia no sucesso do upload para requestId: " + requestId);
+                        }
                     }
 
                     @Override
                     public void onError(String requestId, ErrorInfo error) {
-                        // Exibir mensagem de erro
+                        Toast.makeText(PerfilUser.this, "Erro no upload da imagem: " + error.getDescription(), Toast.LENGTH_LONG).show();
+                        Log.e("PerfilUser", "Erro Cloudinary no upload para requestId " + requestId + ": " + error.getDescription());
                     }
 
                     @Override
                     public void onReschedule(String requestId, ErrorInfo error) {
-                        // Lidar com reenvios
+                        Log.w("PerfilUser", "Upload reagendado para requestId " + requestId + ": " + error.getDescription());
                     }
                 })
                 .dispatch();
     }
 
-    private void saveImageUrlToFirestore(String imageUrl) {
+    private void saveImageUrlToRealtimeDatabase(String imageUrl) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("usuarios").document(user.getUid())
-                    .update("fotoPerfil", imageUrl)
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("fotoPerfilUrl", imageUrl);
+
+            databaseReference.child("usuarios").child(user.getUid()).updateChildren(updates)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Imagem salva com sucesso!", Toast.LENGTH_SHORT).show();
-                        // Recarrega a imagem na ImageView com a URL que acabou de ser salva
+                        Toast.makeText(this, "Imagem de perfil salva com sucesso!", Toast.LENGTH_SHORT).show();
+                        Log.d("PerfilUser", "URL da foto de perfil salva no Realtime Database: " + imageUrl);
                         if (imageUrl != null && !imageUrl.isEmpty()) {
                             Glide.with(this)
                                     .load(imageUrl)
+                                    .placeholder(R.drawable.ic_user)
+                                    .error(R.drawable.ic_launcher_background)
                                     .into(ivFoto);
+                        }
+                        if (usuario != null) {
+                            usuario.setFotoPerfilUrl(imageUrl);
                         }
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(this, "Falha ao salvar imagem de perfil: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("PerfilUser", "Erro ao salvar URL da foto de perfil no Realtime Database", e);
                     });
         }
-    }
-
-    private void loadUserProfileImage(String userId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("usuarios").document(userId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String imageUrl = documentSnapshot.getString("fotoPerfil");
-                        if (imageUrl != null && !imageUrl.isEmpty()) { // Adicione uma verificação de null e vazio
-                            Glide.with(this)
-                                    .load(imageUrl)
-                                    .into(ivFoto);
-                        } else {
-                            // Opcional: Se não houver imagem, carregar uma imagem padrão
-                            ivFoto.setImageResource(R.drawable.ic_user);
-                        }
-                    } else {
-                        // Opcional: Se o documento do usuário não existir, carregar uma imagem padrão
-                        ivFoto.setImageResource(R.drawable.ic_user);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    // Exibir mensagem de erro ou carregar imagem padrão em caso de falha
-                    Toast.makeText(this, "Erro ao carregar imagem de perfil: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    ivFoto.setImageResource(R.drawable.ic_user); // Carregar imagem padrão
-                });
     }
 }

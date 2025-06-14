@@ -9,12 +9,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler; // Importar Handler
-import android.os.Looper; // Importar Looper
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,16 +21,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.svyatogor.appcaronaa3.Adapters.MotoristaAdapter;
 import com.svyatogor.appcaronaa3.Model.Usuario;
 import com.svyatogor.appcaronaa3.R;
 
@@ -51,8 +53,10 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -60,7 +64,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class TelaPassageiro extends AppCompatActivity implements LocationListener {
+public class TelaPassageiro extends AppCompatActivity implements LocationListener, MotoristaAdapter.OnAceitarClickListener {
 
     private MapView map;
     private MyLocationNewOverlay mLocationOverlay;
@@ -69,6 +73,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     private Button btnSolicitarCarona;
     private ListView lvMotoristas;
     private TextView tvMotoristasDisponiveis;
+    private TextView tvStatusCarona; // Novo TextView para exibir o status da carona
 
     private LocationManager locationManager;
     private GeoPoint currentLocation;
@@ -76,19 +81,21 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     private DatabaseReference databaseReference;
     private FirebaseAuth auth;
     private List<Usuario> motoristasDisponiveis;
-    private ArrayAdapter<Usuario> motoristasAdapter;
+    private MotoristaAdapter motoristasAdapter;
+
     private final String API_KEY = "5b3ce3597851110001cf624859742347a61f4c38a2cf371021231169";
 
-    // --- Variáveis para o Debounce da Localização GPS (etOrigem preenchimento automático) ---
     private Handler locationHandler = new Handler(Looper.getMainLooper());
     private Runnable reverseGeocodeRunnable;
-    private static final long REVERSE_GEOCODE_DELAY_MS = 4000; // 4 segundos de atraso
-    private boolean isInitialLocationSet = false; // Flag para garantir a primeira atualização rápida
+    private static final long REVERSE_GEOCODE_DELAY_MS = 4000;
+    private boolean isInitialLocationSet = false;
 
-    // --- Variáveis para o Debounce dos EditText (origem/destino digitados) ---
     private Handler etHandler = new Handler(Looper.getMainLooper());
     private Runnable etOrigemDebounceRunnable, etDestinoDebounceRunnable;
-    private static final long ET_DEBOUNCE_DELAY_MS = 1000; // 1 segundo de atraso para os EditText
+    private static final long ET_DEBOUNCE_DELAY_MS = 1000;
+
+    private String currentRideRequestId = null; // ID da solicitação de carona atual do passageiro
+    private ValueEventListener rideRequestListener; // Listener para a solicitação de carona
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,57 +107,50 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
 
         setContentView(R.layout.activity_tela_passageiro);
 
-        // Inicialização dos componentes da UI
         iniciarComponentes();
 
-        // Permissões
         requestPermissionsIfNecessary(new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
-        // Configuração do mapa
         setupMap();
 
-        // Inicialização do Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
 
-        // Configuração da lista de motoristas
         motoristasDisponiveis = new ArrayList<>();
-        motoristasAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, motoristasDisponiveis);
+        motoristasAdapter = new MotoristaAdapter(this, motoristasDisponiveis, this);
         lvMotoristas.setAdapter(motoristasAdapter);
 
-        // Obter localização atual e configurar listeners
+        // Inicialmente, tudo relacionado à solicitação de motoristas deve estar oculto
+        tvMotoristasDisponiveis.setVisibility(View.GONE);
+        lvMotoristas.setVisibility(View.GONE);
+        tvStatusCarona.setVisibility(View.GONE); // Ocultar o novo TextView de status inicialmente
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Ajustando a frequência das atualizações do GPS (5s e 10m)
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
-            // Tenta obter a última localização conhecida para preencher o campo de origem
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (lastKnownLocation != null) {
                 currentLocation = new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-                reverseGeocode(currentLocation, etOrigem); // Preenche a origem rapidamente no início
+                reverseGeocode(currentLocation, etOrigem);
                 isInitialLocationSet = true;
             }
         } else {
             Toast.makeText(this, "Permissão de localização não concedida. Por favor, habilite nas configurações.", Toast.LENGTH_LONG).show();
-            // Desabilita o campo de origem ou mostra um placeholder diferente se a localização não for concedida
             etOrigem.setHint("Permissão de localização necessária");
-            etOrigem.setEnabled(false); // Desabilita edição se não houver GPS
+            etOrigem.setEnabled(false);
         }
 
-        // Listener para o botão de solicitar carona (executa o metodo)
         btnSolicitarCarona.setOnClickListener(v -> solicitarCarona());
 
-        // Listener para o icone de perfil para configurar perfil de usuario
         icUserPassageiro.setOnClickListener(v -> {
             startActivity(new Intent(TelaPassageiro.this, PerfilUser.class));
         });
 
-        // Listeners com Debounce para os EditText de Origem e Destino
         etOrigem.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) { // Quando o foco sai do EditText
+            if (!hasFocus) {
                 if (etOrigemDebounceRunnable != null) {
                     etHandler.removeCallbacks(etOrigemDebounceRunnable);
                 }
@@ -161,7 +161,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                     }
                 };
                 etHandler.postDelayed(etOrigemDebounceRunnable, ET_DEBOUNCE_DELAY_MS);
-            } else { // Quando o foco entra no EditText
+            } else {
                 if (etOrigemDebounceRunnable != null) {
                     etHandler.removeCallbacks(etOrigemDebounceRunnable);
                 }
@@ -169,7 +169,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         });
 
         etDestino.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) { // Quando o foco sai do EditText
+            if (!hasFocus) {
                 if (etDestinoDebounceRunnable != null) {
                     etHandler.removeCallbacks(etDestinoDebounceRunnable);
                 }
@@ -180,17 +180,13 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                     }
                 };
                 etHandler.postDelayed(etDestinoDebounceRunnable, ET_DEBOUNCE_DELAY_MS);
-            } else { // Quando o foco entra no EditText
+            } else {
                 if (etDestinoDebounceRunnable != null) {
                     etHandler.removeCallbacks(etDestinoDebounceRunnable);
                 }
             }
         });
-
-        // Buscar motoristas disponíveis
-        buscarMotoristasDisponiveis();
-
-    } // fim do onCreate
+    }
 
     private void iniciarComponentes(){
         map = findViewById(R.id.map_view_passageiro);
@@ -200,6 +196,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         lvMotoristas = findViewById(R.id.lv_motoristas);
         tvMotoristasDisponiveis = findViewById(R.id.tv_motoristas_disponiveis);
         icUserPassageiro = findViewById(R.id.ic_user_passageiro);
+        tvStatusCarona = findViewById(R.id.tv_status_carona); // Inicialize o novo TextView
     }
 
     private void solicitarCarona() {
@@ -211,22 +208,150 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             return;
         }
 
-        // Salvar a solicitação de carona no Firebase para o usuário atual
-        String userId = auth.getCurrentUser().getUid();
-        DatabaseReference usuarioRef = databaseReference.child("usuarios").child(userId);
-        usuarioRef.child("pontoDeChegada").setValue(origem);
-        usuarioRef.child("destino").setValue(destino);
-        usuarioRef.child("isLookingForRide").setValue(true)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(TelaPassageiro.this, "Carona solicitada! Aguarde um motorista.", Toast.LENGTH_LONG).show();
-                    // Aqui você pode adicionar lógica para esperar por uma resposta de motoristas
-                    // e talvez mostrar uma animação de "buscando motoristas"
-                })
-                .addOnFailureListener(e -> Toast.makeText(TelaPassageiro.this, "Erro ao solicitar carona: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        FirebaseUser user = auth.getCurrentUser();
+        // Logando o estado do usuário antes de usar o UID
+        Log.d("TelaPassageiro", "Current User: " + (user != null ? user.getUid() : "null"));
 
-        // Desenhar a rota no mapa
+
+        if (user == null) {
+            Toast.makeText(this, "Você precisa estar logado para solicitar uma carona.", Toast.LENGTH_SHORT).show();
+            Log.e("TelaPassageiro", "Erro: currentUser é null. Não é possível solicitar carona.");
+            return;
+        }
+
+        // Verificação adicional para o UID ser nulo (embora currentUser não seja nulo)
+        if (user.getUid() == null) {
+            Toast.makeText(this, "Erro: UID do usuário é nulo. Tente fazer login novamente.", Toast.LENGTH_LONG).show();
+            Log.e("TelaPassageiro", "Erro: currentUser.getUid() é null. Não é possível solicitar carona.");
+            return;
+        }
+
+        // Esconde os campos de input e o botão de solicitar
+        etOrigem.setVisibility(View.GONE);
+        etDestino.setVisibility(View.GONE);
+        btnSolicitarCarona.setVisibility(View.GONE);
+        tvMotoristasDisponiveis.setVisibility(View.GONE); // Garante que a lista não esteja visível
+        lvMotoristas.setVisibility(View.GONE);
+
+        // Exibe a mensagem de status
+        tvStatusCarona.setText("Carona solicitada! Aguardando motorista...");
+        tvStatusCarona.setVisibility(View.VISIBLE);
+
+        // Cria uma nova solicitação de carona no Firebase
+        currentRideRequestId = databaseReference.child("solicitacoes_carona").push().getKey();
+        if (currentRideRequestId != null) {
+            Map<String, Object> solicitacaoCarona = new HashMap<>();
+            solicitacaoCarona.put("passageiroUid", user.getUid()); // Agora com verificação de null
+            solicitacaoCarona.put("origem", origem);
+            solicitacaoCarona.put("destino", destino);
+            solicitacaoCarona.put("status", "pendente"); // Status inicial
+            solicitacaoCarona.put("timestamp", System.currentTimeMillis());
+
+            databaseReference.child("solicitacoes_carona").child(currentRideRequestId).setValue(solicitacaoCarona)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("TelaPassageiro", "Solicitação de carona enviada. ID: " + currentRideRequestId + " Passageiro UID: " + user.getUid());
+                        // Inicia a escuta para o status desta solicitação
+                        listenForRideRequestStatus(currentRideRequestId);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(TelaPassageiro.this, "Erro ao solicitar carona: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("TelaPassageiro", "Erro ao enviar solicitação de carona: " + e.getMessage());
+                        resetPassengerUI(); // Em caso de erro, resetar a UI
+                    });
+        } else {
+            Toast.makeText(TelaPassageiro.this, "Erro ao gerar ID de solicitação.", Toast.LENGTH_SHORT).show();
+            resetPassengerUI(); // Em caso de erro, resetar a UI
+        }
+
+        // Desenhar a rota no mapa (opcional, pode ser feito após aceitação)
         buscarCoordenadas(origem, destino);
     }
+
+    private void listenForRideRequestStatus(String requestId) {
+        // Remover listener anterior se existir para evitar múltiplos listeners para a mesma solicitação
+        if (rideRequestListener != null) {
+            databaseReference.child("solicitacoes_carona").child(requestId).removeEventListener(rideRequestListener);
+        }
+
+        rideRequestListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String status = snapshot.child("status").getValue(String.class);
+                String driverUid = snapshot.child("driverUid").getValue(String.class);
+                Log.d("TelaPassageiro", "Status da solicitação " + requestId + ": " + status + " Driver UID: " + driverUid);
+
+                if ("accepted".equals(status) && driverUid != null) {
+                    // Motorista aceitou a carona
+                    tvStatusCarona.setVisibility(View.GONE); // Esconde a mensagem de status
+                    tvMotoristasDisponiveis.setText("Motorista Aceito:");
+                    tvMotoristasDisponiveis.setVisibility(View.VISIBLE);
+                    lvMotoristas.setVisibility(View.VISIBLE);
+
+                    // Busca os dados do motorista aceito
+                    databaseReference.child("usuarios").child(driverUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot driverSnapshot) {
+                            Usuario motoristaAceito = driverSnapshot.getValue(Usuario.class);
+                            if (motoristaAceito != null) {
+                                motoristaAceito.setUid(driverSnapshot.getKey()); // Garante que o UID está setado
+                                motoristasDisponiveis.clear();
+                                motoristasDisponiveis.add(motoristaAceito);
+                                motoristasAdapter.notifyDataSetChanged();
+                                Toast.makeText(TelaPassageiro.this, "Motorista " + motoristaAceito.getNome() + " aceitou sua carona!", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(TelaPassageiro.this, "Motorista aceito não encontrado no cadastro de usuários.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e("TelaPassageiro", "Erro ao buscar dados do motorista aceito: " + error.getMessage());
+                            Toast.makeText(TelaPassageiro.this, "Erro ao carregar detalhes do motorista.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else if ("cancelled".equals(status)) {
+                    // Motorista cancelou ou solicitação foi cancelada
+                    Toast.makeText(TelaPassageiro.this, "Sua solicitação de carona foi cancelada pelo motorista.", Toast.LENGTH_LONG).show();
+                    resetPassengerUI();
+                } else if (!snapshot.exists()) {
+                    // Se a solicitação não existe mais (ex: foi excluída)
+                    Toast.makeText(TelaPassageiro.this, "Sua solicitação de carona não existe mais.", Toast.LENGTH_LONG).show();
+                    resetPassengerUI();
+                }
+                // Adicione outras condições de status se necessário (ex: "in_progress", "completed")
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("TelaPassageiro", "Erro ao ouvir status da solicitação: " + error.getMessage());
+                Toast.makeText(TelaPassageiro.this, "Erro de comunicação com a carona.", Toast.LENGTH_SHORT).show();
+                resetPassengerUI();
+            }
+        };
+        databaseReference.child("solicitacoes_carona").child(requestId).addValueEventListener(rideRequestListener);
+    }
+
+    // Método para resetar a UI do passageiro para o estado inicial de solicitação
+    private void resetPassengerUI() {
+        tvStatusCarona.setVisibility(View.GONE);
+        tvMotoristasDisponiveis.setVisibility(View.GONE);
+        lvMotoristas.setVisibility(View.GONE);
+
+        etOrigem.setVisibility(View.VISIBLE);
+        etDestino.setVisibility(View.VISIBLE);
+        btnSolicitarCarona.setVisibility(View.VISIBLE);
+
+        motoristasDisponiveis.clear();
+        motoristasAdapter.notifyDataSetChanged();
+
+        if (currentRideRequestId != null && rideRequestListener != null) {
+            databaseReference.child("solicitacoes_carona").child(currentRideRequestId).removeEventListener(rideRequestListener);
+            currentRideRequestId = null;
+        }
+        Toast.makeText(TelaPassageiro.this, "Você pode solicitar uma nova carona.", Toast.LENGTH_SHORT).show();
+    }
+
 
     public void setupMap() {
         if (map != null) {
@@ -234,7 +359,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             map.setMultiTouchControls(true);
             IMapController mapController = map.getController();
             mapController.setZoom(14.5);
-            // Centraliza em uma localização padrão (ex: Sete Lagoas, MG)
             mapController.setCenter(new GeoPoint(-19.4600, -44.2486));
 
             mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
@@ -290,34 +414,31 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
 
     private void adicionarMarcador(GeoPoint p, String titulo, int cor) {
         runOnUiThread(() -> {
-            // Remove marcadores existentes de origem/destino para evitar sobreposição
-            // Remove marcadores existentes com o mesmo título para evitar duplicidade
             map.getOverlays().removeIf(overlay -> overlay instanceof Marker && ((Marker) overlay).getTitle() != null && ((Marker) overlay).getTitle().equals(titulo));
 
             Marker marker = new Marker(map);
             marker.setPosition(p);
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setTitle(titulo);
-            // Defina um ícone personalizado se desejar, por exemplo:
-            // marker.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_marker_origem));
             map.getOverlays().add(marker);
-            map.invalidate(); // Redesenha o mapa
+            map.invalidate();
         });
     }
 
     private GeoPoint geocodificar(String endereco) throws IOException {
         OkHttpClient client = new OkHttpClient();
-        // Codifica o endereço para URL para lidar com espaços e caracteres especiais
         String encodedAddress = java.net.URLEncoder.encode(endereco, "UTF-8");
-        String url = "https://api.openrouteservice.org/geocode/search?api_key=" + API_KEY + "&text=" + encodedAddress;
+        String url = "https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s"; // Use %s para formatar
 
-        Log.d("GEOCODIFICAR_URL", url);
+        // Use String.format para injetar a API_KEY e o endereço codificado
+        String finalUrl = String.format(Locale.US, url, API_KEY, encodedAddress);
 
-        Request request = new Request.Builder().url(url).build();
+        Log.d("GEOCODIFICAR_URL", finalUrl);
+
+        Request request = new Request.Builder().url(finalUrl).build();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 Log.e("GEOCODIFICAR_ERRO", "Erro na resposta: " + response.code() + " - " + response.message());
-                // Lidar com o erro 429 especificamente
                 if (response.code() == 429) {
                     runOnUiThread(() -> Toast.makeText(this, "Limite de requisições excedido. Tente novamente mais tarde.", Toast.LENGTH_LONG).show());
                 }
@@ -365,7 +486,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                     JSONObject properties = features.getJSONObject(0).getJSONObject("properties");
                     String address = properties.optString("label", "Endereço desconhecido");
                     runOnUiThread(() -> {
-                        // Só atualiza o EditText se o usuário não estiver focado nele ou se ele estiver vazio
                         if (!editText.isFocused() || editText.getText().toString().isEmpty()) {
                             editText.setText(address);
                         }
@@ -377,7 +497,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             }
         }).start();
     }
-
 
     private void desenharRota(GeoPoint origem, GeoPoint destino) throws IOException, JSONException {
         OkHttpClient client = new OkHttpClient();
@@ -445,7 +564,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             Log.d("ROTA_PONTOS", "Total de pontos: " + geoPoints.size());
 
             runOnUiThread(() -> {
-                // Limpa rotas anteriores e marcadores de origem/destino antes de desenhar a nova
                 map.getOverlays().removeIf(overlay -> overlay instanceof Polyline);
                 map.getOverlays().removeIf(overlay -> overlay instanceof Marker && (
                         ((Marker) overlay).getTitle() != null &&
@@ -457,16 +575,13 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                 routeLine.setWidth(10f);
                 map.getOverlays().add(routeLine);
 
-                // Adiciona marcadores de origem e destino na rota
                 adicionarMarcador(origem, "Origem", Color.GREEN);
                 adicionarMarcador(destino, "Destino", Color.RED);
 
-                // Zoom para a rota completa, se houver pontos
                 if (!geoPoints.isEmpty()) {
                     BoundingBox boundingBox = BoundingBox.fromGeoPoints(geoPoints);
                     map.zoomToBoundingBox(boundingBox, true, 100);
                 }
-
 
                 map.invalidate();
             });
@@ -503,16 +618,14 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             if (fineLocationGranted) {
                 if (locationManager != null) {
                     try {
-                        // Re-registra as atualizações de localização após a permissão ser concedida
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
-                        // Tenta obter a última localização conhecida novamente
                         Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         if (lastKnownLocation != null && !isInitialLocationSet) {
                             currentLocation = new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
                             reverseGeocode(currentLocation, etOrigem);
                             isInitialLocationSet = true;
                         }
-                        etOrigem.setEnabled(true); // Habilita o campo de origem
+                        etOrigem.setEnabled(true);
                         etOrigem.setHint("Sua localização atual");
                     } catch (SecurityException e) {
                         Log.e("PERMISSIONS", "SecurityException ao tentar requestLocationUpdates: " + e.getMessage());
@@ -522,7 +635,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             } else {
                 Toast.makeText(this, "Permissão de localização negada. Algumas funcionalidades podem não funcionar.", Toast.LENGTH_LONG).show();
                 etOrigem.setHint("Permissão de localização necessária");
-                etOrigem.setEnabled(false); // Mantém o campo de origem desabilitado
+                etOrigem.setEnabled(false);
             }
         }
     }
@@ -531,12 +644,9 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     public void onLocationChanged(Location location) {
         currentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
 
-        // Log para depuração do debounce
         Log.d("GPS_DEBOUNCE", "onLocationChanged chamado. Lat: " + location.getLatitude() + ", Lon: " + location.getLongitude());
 
-        // Se é a primeira atualização ou o campo de origem está vazio e o usuário não está editando
         if (!isInitialLocationSet || (etOrigem.getText().toString().isEmpty() && !etOrigem.isFocused())) {
-            // Remove qualquer runnable anterior para garantir que apenas o mais recente seja executado
             if (reverseGeocodeRunnable != null) {
                 locationHandler.removeCallbacks(reverseGeocodeRunnable);
             }
@@ -544,13 +654,11 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
             reverseGeocodeRunnable = () -> {
                 Log.d("GPS_DEBOUNCE", "Executando reverseGeocode após debounce.");
                 reverseGeocode(currentLocation, etOrigem);
-                isInitialLocationSet = true; // Marca que a localização inicial foi definida
-                // Opcional: Centralizar o mapa na localização atual, mas apenas se o usuário não estiver focado nos EditText
+                isInitialLocationSet = true;
                 if (!etOrigem.isFocused() && !etDestino.isFocused()) {
                     map.getController().animateTo(currentLocation);
                 }
             };
-            // Agenda a execução da geocodificação reversa
             locationHandler.postDelayed(reverseGeocodeRunnable, REVERSE_GEOCODE_DELAY_MS);
         } else {
             Log.d("GPS_DEBOUNCE", "Ignorando reverseGeocode (debounce ou campo sendo editado).");
@@ -568,48 +676,31 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     }
 
     private void buscarMotoristasDisponiveis() {
-        // Altere a consulta inicial para buscar *todos* os usuários, e então filtre localmente
-        // Isso é feito para poder aplicar o filtro isDriver() que não pode ser usado com orderByChild("isLookingForRide").equalTo(false) diretamente se isDriver for outro nó.
-        databaseReference.child("usuarios")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        motoristasDisponiveis.clear();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            Usuario usuario = snapshot.getValue(Usuario.class);
-                            // Filtra por motoristas que não estão procurando carona e são de fato motoristas
-                            if (usuario != null && usuario.getNome() != null && usuario.isDriver() && !usuario.isLookingForRide()) {
-                                // Adicione um filtro para garantir que não é o próprio usuário (passageiro)
-                                if (auth.getCurrentUser() != null && !usuario.getUid().equals(auth.getCurrentUser().getUid())) {
-                                    motoristasDisponiveis.add(usuario);
-                                }
-                            }
-                        }
-                        motoristasAdapter.notifyDataSetChanged();
+        Log.d("TelaPassageiro", "buscarMotoristasDisponiveis() chamado. Esta função agora preenche a lista APENAS com o motorista aceito.");
+    }
 
-                        if (!motoristasDisponiveis.isEmpty()) {
-                            tvMotoristasDisponiveis.setVisibility(View.VISIBLE);
-                            lvMotoristas.setVisibility(View.VISIBLE);
-                        } else {
-                            tvMotoristasDisponiveis.setVisibility(View.GONE);
-                            lvMotoristas.setVisibility(View.GONE);
-                            Toast.makeText(TelaPassageiro.this, "Nenhum motorista disponível no momento.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+    @Override
+    public void onAceitarClick(Usuario motoristaAceito) {
+        if (auth.getCurrentUser() == null || currentRideRequestId == null) {
+            Toast.makeText(this, "Erro: Carona não está em estado de aceitação.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("Firebase", "Erro ao buscar motoristas: " + databaseError.getMessage());
-                        Toast.makeText(TelaPassageiro.this, "Erro ao carregar motoristas.", Toast.LENGTH_SHORT).show();
-                    }
+        databaseReference.child("solicitacoes_carona").child(currentRideRequestId)
+                .child("status").setValue("in_progress")
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(TelaPassageiro.this, "Carona com " + motoristaAceito.getNome() + " iniciada!", Toast.LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(TelaPassageiro.this, "Erro ao iniciar a carona: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("TelaPassageiro", "Erro ao iniciar carona: " + e.getMessage());
                 });
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
         if (map != null) map.onResume();
-        // Re-registra as atualizações de localização ao retornar à Activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
@@ -620,36 +711,38 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
         if (map != null) map.onPause();
-        // Remove as atualizações de localização quando a Activity não está em primeiro plano
         if (locationManager != null) {
             locationManager.removeUpdates(this);
         }
-        // Limpa callbacks pendentes para evitar vazamentos de memória ou chamadas após a pausa
         if (locationHandler != null) {
             locationHandler.removeCallbacksAndMessages(null);
         }
         if (etHandler != null) {
             etHandler.removeCallbacksAndMessages(null);
+        }
+        if (currentRideRequestId != null && rideRequestListener != null) {
+            databaseReference.child("solicitacoes_carona").child(currentRideRequestId).removeEventListener(rideRequestListener);
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Finaliza o mapa e libera recursos
         if (map != null) {
             map.onDetach();
             map = null;
         }
-        // Garante que todos os callbacks sejam removidos ao destruir a Activity
         if (locationHandler != null) {
             locationHandler.removeCallbacksAndMessages(null);
         }
         if (etHandler != null) {
             etHandler.removeCallbacksAndMessages(null);
+        }
+        if (currentRideRequestId != null && rideRequestListener != null) {
+            databaseReference.child("solicitacoes_carona").child(currentRideRequestId).removeEventListener(rideRequestListener);
         }
     }
 }

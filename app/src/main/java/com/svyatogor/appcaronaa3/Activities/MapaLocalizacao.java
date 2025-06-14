@@ -66,12 +66,6 @@ public class MapaLocalizacao extends AppCompatActivity {
     }
 
     private void iniciarComponentes() {
-        EditText etOrigem1 = findViewById(R.id.et_origem1);
-        EditText etDestino1 = findViewById(R.id.et_destino1);
-        EditText etData = findViewById(R.id.et_data);
-        EditText etnVagas = findViewById(R.id.etn_vagas);
-        EditText etOrigem2 = findViewById(R.id.et_origem2);
-        EditText etDestino2 = findViewById(R.id.et_destino2);
         btPublicarCarona = findViewById(R.id.bt_publicar_carona);
         btBuscarCarona = findViewById(R.id.bt_buscar_carona);
         map = findViewById(R.id.map_view_dedicated);
