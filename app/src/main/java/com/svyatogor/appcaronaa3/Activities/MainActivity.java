@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button btnEntrarMotorista;
     private Button btnEntrarPassageiro;
-
+    private ImageView icUser;
     private FirebaseAuth auth;
     private DatabaseReference usersRef;
 
@@ -43,16 +44,21 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Inicializa o Firebase
         auth = FirebaseAuth.getInstance();
         usersRef = FirebaseDatabase.getInstance().getReference("usuarios");
 
         btnEntrarMotorista = findViewById(R.id.btn_entrar_motorista);
         btnEntrarPassageiro = findViewById(R.id.btn_entrar_passageiro);
+        icUser = findViewById(R.id.ic_user);
 
-        btnEntrarMotorista.setOnClickListener(v -> verificarMotoristaStatus()); // Chama o método de verificar status do motorista
+        btnEntrarMotorista.setOnClickListener(v -> verificarMotoristaStatus());
+
         btnEntrarPassageiro.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, TelaPassageiro.class));
+        });
+
+        icUser.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, PerfilUser.class));
         });
     }
 
