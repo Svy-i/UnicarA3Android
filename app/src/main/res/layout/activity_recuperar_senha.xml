@@ -22,6 +22,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.39" />
 
+    <ImageView
+        android:id="@+id/ic_seta_return"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_seta_return" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_enviar_email"
         style="@style/Button"

@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnEntrarMotorista;
     private Button btnEntrarPassageiro;
     private ImageView icUser;
+    private ImageView icSetaReturn;
     private FirebaseAuth auth;
     private DatabaseReference usersRef;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         btnEntrarMotorista = findViewById(R.id.btn_entrar_motorista);
         btnEntrarPassageiro = findViewById(R.id.btn_entrar_passageiro);
         icUser = findViewById(R.id.ic_user);
+        icSetaReturn = findViewById(R.id.ic_seta_return);
 
         btnEntrarMotorista.setOnClickListener(v -> verificarMotoristaStatus());
 
@@ -59,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         icUser.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, PerfilUser.class));
+        });
+        icSetaReturn.setOnClickListener(v -> {
+            finish();
+            startActivity(new Intent(MainActivity.this, TelaLogin.class));
         });
     }
 

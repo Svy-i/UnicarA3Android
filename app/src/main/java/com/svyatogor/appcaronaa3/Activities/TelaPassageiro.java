@@ -78,6 +78,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     private LocationManager locationManager;
     private GeoPoint currentLocation;
     private ImageView icUserPassageiro;
+    private ImageView icSetaReturn;
     private DatabaseReference databaseReference;
     private FirebaseAuth auth;
     private List<Usuario> motoristasDisponiveis;
@@ -126,7 +127,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         // Inicialmente, tudo relacionado à solicitação de motoristas deve estar oculto
         tvMotoristasDisponiveis.setVisibility(View.GONE);
         lvMotoristas.setVisibility(View.GONE);
-        tvStatusCarona.setVisibility(View.GONE); // Ocultar o novo TextView de status inicialmente
+        tvStatusCarona.setVisibility(View.GONE);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -147,6 +148,11 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
 
         icUserPassageiro.setOnClickListener(v -> {
             startActivity(new Intent(TelaPassageiro.this, PerfilUser.class));
+        });
+
+        icSetaReturn.setOnClickListener(v -> {
+            finish();
+            startActivity(new Intent(TelaPassageiro.this, MainActivity.class));
         });
 
         etOrigem.setOnFocusChangeListener((v, hasFocus) -> {
@@ -186,7 +192,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                 }
             }
         });
-    }
+    } // fim do onCreate
 
     private void iniciarComponentes(){
         map = findViewById(R.id.map_view_passageiro);
@@ -196,7 +202,8 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
         lvMotoristas = findViewById(R.id.lv_motoristas);
         tvMotoristasDisponiveis = findViewById(R.id.tv_motoristas_disponiveis);
         icUserPassageiro = findViewById(R.id.ic_user_passageiro);
-        tvStatusCarona = findViewById(R.id.tv_status_carona); // Inicialize o novo TextView
+        icSetaReturn = findViewById(R.id.ic_seta_return);
+        tvStatusCarona = findViewById(R.id.tv_status_carona);
     }
 
     private void solicitarCarona() {
@@ -266,7 +273,6 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
     }
 
     private void listenForRideRequestStatus(String requestId) {
-        // Remover listener anterior se existir para evitar múltiplos listeners para a mesma solicitação
         if (rideRequestListener != null) {
             databaseReference.child("solicitacoes_carona").child(requestId).removeEventListener(rideRequestListener);
         }
@@ -279,8 +285,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                 Log.d("TelaPassageiro", "Status da solicitação " + requestId + ": " + status + " Driver UID: " + driverUid);
 
                 if ("accepted".equals(status) && driverUid != null) {
-                    // Motorista aceitou a carona
-                    tvStatusCarona.setVisibility(View.GONE); // Esconde a mensagem de status
+                    tvStatusCarona.setVisibility(View.GONE);
                     tvMotoristasDisponiveis.setText("Motorista Aceito:");
                     tvMotoristasDisponiveis.setVisibility(View.VISIBLE);
                     lvMotoristas.setVisibility(View.VISIBLE);
@@ -291,7 +296,7 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                         public void onDataChange(@NonNull DataSnapshot driverSnapshot) {
                             Usuario motoristaAceito = driverSnapshot.getValue(Usuario.class);
                             if (motoristaAceito != null) {
-                                motoristaAceito.setUid(driverSnapshot.getKey()); // Garante que o UID está setado
+                                motoristaAceito.setUid(driverSnapshot.getKey());
                                 motoristasDisponiveis.clear();
                                 motoristasDisponiveis.add(motoristaAceito);
                                 motoristasAdapter.notifyDataSetChanged();
@@ -309,11 +314,9 @@ public class TelaPassageiro extends AppCompatActivity implements LocationListene
                     });
 
                 } else if ("cancelled".equals(status)) {
-                    // Motorista cancelou ou solicitação foi cancelada
                     Toast.makeText(TelaPassageiro.this, "Sua solicitação de carona foi cancelada pelo motorista.", Toast.LENGTH_LONG).show();
                     resetPassengerUI();
                 } else if (!snapshot.exists()) {
-                    // Se a solicitação não existe mais (ex: foi excluída)
                     Toast.makeText(TelaPassageiro.this, "Sua solicitação de carona não existe mais.", Toast.LENGTH_LONG).show();
                     resetPassengerUI();
                 }

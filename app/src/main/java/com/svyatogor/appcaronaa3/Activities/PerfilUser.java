@@ -64,6 +64,7 @@ public class PerfilUser extends AppCompatActivity {
     private ImageView ivEditTelefone;
     private ImageView ivEditFoto;
     private ImageView ivFoto;
+    private ImageView icSetaReturn;
     private EditText etEditTelefone;
 
     private Usuario usuario;
@@ -153,7 +154,11 @@ public class PerfilUser extends AppCompatActivity {
                 }
             }
         });
-    }
+        icSetaReturn.setOnClickListener(v -> {
+            finish();
+            startActivity(new Intent(this, MainActivity.class));
+        });
+    } // fim do onCreate
 
     private void carregarDadosDoUsuario() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -247,6 +252,7 @@ public class PerfilUser extends AppCompatActivity {
         ivEditFoto = findViewById(R.id.iv_edit_foto);
         ivEditTelefone = findViewById(R.id.iv_edit_telefone);
         ivFoto = findViewById(R.id.iv_foto);
+        icSetaReturn = findViewById(R.id.ic_seta_return);
     }
 
     private void abrirCamera() {

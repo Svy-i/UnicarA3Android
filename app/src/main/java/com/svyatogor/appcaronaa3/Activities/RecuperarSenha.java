@@ -1,8 +1,10 @@
 package com.svyatogor.appcaronaa3.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ public class RecuperarSenha extends AppCompatActivity {
     private EditText etEmailRecuperacao;
     private Button btEnviarEmail;
     private FirebaseAuth auth;
+    private ImageView icSetaReturn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +43,16 @@ public class RecuperarSenha extends AppCompatActivity {
                         }
                     });
         });
+        icSetaReturn.setOnClickListener(v -> {
+            finish();
+            startActivity(new Intent(this, TelaLogin.class));
+        });
     }//fim do onCreate
 
     private void iniciarComponentes(){
         etEmailRecuperacao = findViewById(R.id.et_email_recuperacao);
         btEnviarEmail = findViewById(R.id.bt_enviar_email);
         auth = FirebaseAuth.getInstance();
+        icSetaReturn = findViewById(R.id.ic_seta_return);
     }
 }

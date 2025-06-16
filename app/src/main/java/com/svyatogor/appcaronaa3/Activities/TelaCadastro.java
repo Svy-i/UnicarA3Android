@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -32,6 +33,7 @@ public class TelaCadastro extends AppCompatActivity {
     private EditText etEmailCadastro;
     private EditText etSenhaCadastro;
     private EditText etTelefoneCadastro;
+    private ImageView icSetaReturn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,10 @@ public class TelaCadastro extends AppCompatActivity {
         });
         iniciarComponentes();
         Cadastrar();
+        icSetaReturn.setOnClickListener(v -> {
+            finish();
+            startActivity(new Intent(this, TelaLogin.class));
+        });
     } // fim do onCreate
     private void iniciarComponentes(){
         btCadastro = findViewById(R.id.btn_cadastro);
@@ -52,6 +58,7 @@ public class TelaCadastro extends AppCompatActivity {
         etEmailCadastro = findViewById(R.id.et_email_cadastro);
         etSenhaCadastro = findViewById(R.id.et_senha_cadastro);
         etTelefoneCadastro = findViewById(R.id.et_telefone_cadastro);
+        icSetaReturn = findViewById(R.id.ic_seta_return);
     }
     private void Cadastrar() {
         btCadastro.setOnClickListener(v -> {

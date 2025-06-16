@@ -114,7 +114,17 @@
         android:id="@+id/ic_user_passageiro"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_user" />
+
+    <ImageView
+        android:id="@+id/ic_seta_return"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_seta_return" />
 </androidx.constraintlayout.widget.ConstraintLayout>

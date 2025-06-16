@@ -84,6 +84,14 @@
         app:layout_constraintStart_toStartOf="@+id/v_container_components"
         app:layout_constraintTop_toBottomOf="@+id/et_senha_cadastro" />
 
+    <ImageView
+        android:id="@+id/ic_seta_return"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_seta_return" />
+
     <Button
         android:id="@+id/btn_cadastro"
         style="@style/Button"
