@@ -49,7 +49,7 @@ public class TelaCadastro extends AppCompatActivity {
         Cadastrar();
         icSetaReturn.setOnClickListener(v -> {
             finish();
-            startActivity(new Intent(this, TelaLogin.class));
+            startActivity(new Intent(TelaCadastro.this, TelaLogin.class));
         });
     } // fim do onCreate
     private void iniciarComponentes(){

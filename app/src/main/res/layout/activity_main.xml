@@ -15,7 +15,6 @@
         android:layout_width="220dp"
         android:layout_height="50dp"
         android:layout_marginTop="32dp"
-        android:backgroundTint="#3CEB40"
         android:text="Passageiro"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,31 +27,33 @@
         style="@style/Button"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:backgroundTint="#3CEB40"
         android:text="Motorista"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.3" />
 
     <TextView
         android:id="@+id/textView"
         style="@style/tv_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:text="Deseja entrar como:"
-        app:layout_constraintBottom_toTopOf="@+id/btn_entrar_motorista"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.100000024" />
 
     <ImageView
         android:id="@+id/ic_user"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_user" />
@@ -61,6 +62,8 @@
         android:id="@+id/ic_seta_return"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_seta_return" />

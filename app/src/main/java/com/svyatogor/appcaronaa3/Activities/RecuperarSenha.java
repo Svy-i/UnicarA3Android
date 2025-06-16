@@ -37,7 +37,7 @@ public class RecuperarSenha extends AppCompatActivity {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(this, "Link de recuperação de senha enviado para seu email!", Toast.LENGTH_LONG).show();
-                            finish(); // Fecha a tela e volta para o login
+                            finish();
                         } else {
                             Toast.makeText(this, "Erro: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -45,7 +45,7 @@ public class RecuperarSenha extends AppCompatActivity {
         });
         icSetaReturn.setOnClickListener(v -> {
             finish();
-            startActivity(new Intent(this, TelaLogin.class));
+            startActivity(new Intent(RecuperarSenha.this, TelaLogin.class));
         });
     }//fim do onCreate
 

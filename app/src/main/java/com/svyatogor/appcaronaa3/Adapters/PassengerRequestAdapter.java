@@ -66,7 +66,6 @@ public class PassengerRequestAdapter extends RecyclerView.Adapter<PassengerReque
             tvPassengerName = itemView.findViewById(R.id.tvPassengerName);
             tvPickupLocation = itemView.findViewById(R.id.tvPickupLocation);
             tvDestination = itemView.findViewById(R.id.tvDestination);
-            tvEstimatedDistance = itemView.findViewById(R.id.tvEstimatedDistance); // Opcional
             btnAcceptRide = itemView.findViewById(R.id.btnAcceptRide);
         }
     }

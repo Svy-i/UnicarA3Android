@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@color/white"
         android:padding="16dp">
 
         <TextView
@@ -29,6 +30,7 @@
             android:text="Partida: Rua X, 123 - Centro"
             android:textSize="16sp"
             android:layout_marginTop="8dp"
+            android:textColor="@color/black"
             android:gravity="center_vertical"/>
 
         <TextView
@@ -38,27 +40,20 @@
             android:text="Destino: Av Y, 456 - Bairro Z"
             android:textSize="16sp"
             android:layout_marginTop="4dp"
+            android:textColor="@color/black"
             android:gravity="center_vertical"/>
 
-        <TextView
-            android:id="@+id/tvEstimatedDistance"
+        <Button
+            android:id="@+id/btnAcceptRide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distância: ~5.2 km"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
-            android:layout_marginTop="4dp"
-            android:visibility="gone"/> <Button
-        android:id="@+id/btnAcceptRide"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Aceitar Carona"
-        android:layout_gravity="end"
-        android:layout_marginTop="16dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:textColor="@android:color/white"/>
+            android:text="Aceitar Carona"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@android:color/white"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

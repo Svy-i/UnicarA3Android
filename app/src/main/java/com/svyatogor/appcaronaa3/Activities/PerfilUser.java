@@ -69,7 +69,7 @@ public class PerfilUser extends AppCompatActivity {
 
     private Usuario usuario;
 
-    private DatabaseReference databaseReference; // Referência para o Realtime Database
+    private DatabaseReference databaseReference;
 
     // Activity para captura de foto
     private final ActivityResultLauncher<Intent> capturarFoto = registerForActivityResult(
@@ -156,7 +156,7 @@ public class PerfilUser extends AppCompatActivity {
         });
         icSetaReturn.setOnClickListener(v -> {
             finish();
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(PerfilUser.this, MainActivity.class));
         });
     } // fim do onCreate
 

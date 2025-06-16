@@ -114,7 +114,8 @@
         android:id="@+id/ic_user_passageiro"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_user" />
@@ -123,7 +124,8 @@
         android:id="@+id/ic_seta_return"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_seta_return" />
